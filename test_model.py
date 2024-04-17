@@ -1,32 +1,31 @@
+#!/usr/bin/env python3
+
+# Import this file so that the environment is available on gym.make()
+import discrete_fetch_reach
+
 import gymnasium as gym
 from gymnasium.wrappers import RecordVideo
 from stable_baselines3 import DQN
 
+
 # load env
-env = gym.make('FetchReachDense-v2', max_episode_steps=50, render_mode="rgb_array")
+env = gym.make('FetchReachDense-custom', max_episode_steps=50, render_mode="human")
 
-# convert action space from continuous to discrete
-values = [-0.2, 0, 0.2]
-actions = [(x,y,z,0) for x in values for y in values for z in values]
-
-env.action_space = gym.spaces.discrete.Discrete(len(actions))
-
-env.continuous_step = env.step
-env.step = lambda x: env.continuous_step(actions[x])
-
-env = RecordVideo(env, video_folder="cartpole-agent", name_prefix="eval",
-                  episode_trigger=lambda x: True)
+# record video
+# env = RecordVideo(env, video_folder="cartpole-agent", name_prefix="eval",
+#                   episode_trigger=lambda x: True)
 
 observation, info = env.reset(seed=42)
 
 # test model
-model = DQN.load("dqn_fetch_reach")
+model = DQN.load("dqn_fetch_reach_1m_ts")
 
 observation, info = env.reset()
-for _ in range(1000):
+for _ in range(500):
     action, _states = model.predict(observation, deterministic=True)
     observation, reward, terminated, truncated, info = env.step(action)
 
-    if terminated or truncated:
+    if terminated or truncated or info["is_success"]:
         observation, info = env.reset()
+
 env.close()
