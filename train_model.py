@@ -7,7 +7,7 @@ import gymnasium as gym
 from stable_baselines3 import DQN
 
 # load env
-env = gym.make('FetchReachDense-custom', max_episode_steps=50, render_mode="human")
+env = gym.make('FetchReachDense-custom', max_episode_steps=50) #, render_mode="human")
 
 observation, info = env.reset(seed=42)
 
