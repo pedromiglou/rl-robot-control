@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Import this file so that the environment is available on gym.make()
+### Import this file so that the environment is available on gym.make()
 import discrete_fetch_reach
 
 import gymnasium as gym
@@ -18,7 +18,7 @@ env = gym.make('FetchReachDense-custom', max_episode_steps=50, render_mode="huma
 observation, info = env.reset(seed=42)
 
 # test model
-model = DQN.load("dqn_fetch_reach_1m_ts")
+model = DQN.load("models/dqn_fetch_reach_corrected")
 
 observation, info = env.reset()
 for _ in range(500):
