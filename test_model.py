@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from gymnasium.wrappers import RecordVideo
 from stable_baselines3 import DQN
 
 from envs.discrete_fetch_reach import DiscreteFetchReach
@@ -8,10 +7,7 @@ from envs.discrete_fetch_reach import DiscreteFetchReach
 
 # load env
 env = DiscreteFetchReach(max_episode_steps=50, render_mode="human")
-
-# record video
-# env = RecordVideo(env, video_folder="cartpole-agent", name_prefix="eval",
-#                   episode_trigger=lambda x: True)
+# env = DiscreteFetchReach(max_episode_steps=50, render_mode="rgb_array", record=True)
 
 observation, info = env.reset(seed=42)
 
