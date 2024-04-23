@@ -3,7 +3,7 @@
 from stable_baselines3 import DQN
 from stable_baselines3.common.logger import configure
 
-from envs.discrete_fetch_reach import DiscreteFetchReach
+from env import DiscreteFetchReach
 
 
 # load env
@@ -19,7 +19,7 @@ model = DQN("MultiInputPolicy", env, verbose=1)
 #model.set_env(env)
 model.set_logger(new_logger)
 model.learn(total_timesteps=1e6, log_interval=20)
-model.save("dqn_fetch_reach")
+model.save("models/dqn_fetch_reach")
 
 print("training finished")
 

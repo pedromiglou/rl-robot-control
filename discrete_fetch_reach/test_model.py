@@ -2,7 +2,7 @@
 
 from stable_baselines3 import DQN
 
-from envs.discrete_fetch_reach import DiscreteFetchReach
+from env import DiscreteFetchReach
 
 
 # load env
@@ -12,7 +12,7 @@ env = DiscreteFetchReach(max_episode_steps=50, render_mode="human")
 observation, info = env.reset(seed=42)
 
 # test model
-model = DQN.load("models/dqn_fetch_reach_corrected")
+model = DQN.load("models/dqn_fetch_reach")
 
 observation, info = env.reset()
 for _ in range(500):

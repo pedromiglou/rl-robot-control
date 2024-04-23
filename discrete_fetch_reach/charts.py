@@ -51,7 +51,7 @@ def create_line_chart(x, y, xlabel, ylabel, avg_line = False, save_path=None):
 
 
 # Specify the file path
-file_path = '/home/miglou/gym-distrobox/rl-robot-control/logs/progress.csv'
+file_path = './logs/progress.csv'
 
 # Read the CSV file
 df = pd.read_csv(file_path)
