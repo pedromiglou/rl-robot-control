@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import gymnasium as gym
 
 from stable_baselines3 import DQN
+
 
 env = gym.make("CartPole-v1", render_mode="human")
 

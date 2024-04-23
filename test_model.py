@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
-### Import this file so that the environment is available on gym.make()
-import discrete_fetch_reach
-
-import gymnasium as gym
 from gymnasium.wrappers import RecordVideo
 from stable_baselines3 import DQN
 
+from envs.discrete_fetch_reach import DiscreteFetchReach
+
 
 # load env
-env = gym.make('FetchReachDense-custom', max_episode_steps=50, render_mode="human")
+env = DiscreteFetchReach(max_episode_steps=50, render_mode="human")
 
 # record video
 # env = RecordVideo(env, video_folder="cartpole-agent", name_prefix="eval",

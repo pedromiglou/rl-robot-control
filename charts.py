@@ -1,14 +1,18 @@
-import pandas as pd
+#!/usr/bin/env python3
 
-import numpy as np
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 from scipy.interpolate import interp1d
+
 
 plt.rcParams['svg.fonttype'] = 'none'
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 15
+
 
 def create_line_chart(x, y, xlabel, ylabel, avg_line = False, save_path=None):
     # Create a figure and axis
