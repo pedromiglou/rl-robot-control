@@ -12,7 +12,7 @@ from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
 
 class CustomMujocoFetchReachEnv(MujocoFetchReachEnv):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(**kwargs, reward_type="dense")
 
     def _set_action(self, action):
         pass
@@ -83,7 +83,8 @@ class FetchReachJointsControl(gym.Env):
 
         for i in range(7):            
             mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], action[i])
-            mujoco_utils.reset_mocap2body_xpos(self.env.model, self.env.data)
+        
+        mujoco_utils.reset_mocap2body_xpos(self.env.model, self.env.data)
 
         action = np.array([0, 0, 0, 0])
 
