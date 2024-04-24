@@ -4,13 +4,34 @@ import gymnasium as gym
 import numpy as np
 
 from gymnasium_robotics.utils import mujoco_utils
+from gymnasium_robotics.envs.fetch.reach import MujocoFetchReachEnv
+from gymnasium.envs.registration import register
 from gymnasium.spaces.discrete import Discrete
 from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
 
 
+class CustomMujocoFetchReachEnv(MujocoFetchReachEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _set_action(self, action):
+        pass
+        #print("gg")
+
+register(
+    # unique identifier for the env `name-version`
+    id='FetchReachDense-custom',
+    # path to the class for creating the env
+    # Note: entry_point also accept a class as input (and not only a string)
+    entry_point="env:CustomMujocoFetchReachEnv",
+    # Max number of steps per episode, using a `TimeLimitWrapper`
+    max_episode_steps=50,
+)
+
+
 class FetchReachJointsControl(gym.Env):
     def __init__(self, record=False, **kwargs):
-        self.env = gym.make('FetchReachDense-v2', **kwargs)
+        self.env = gym.make('FetchReachDense-custom', **kwargs)
 
         self.joint_names = [
             "robot0:shoulder_pan_joint",
@@ -56,10 +77,13 @@ class FetchReachJointsControl(gym.Env):
         x = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[0]
         action = np.array(self.discrete_actions[action])
 
+        #print(x)
         action += x
+        #print(action)
 
-        for i in range(7):
+        for i in range(7):            
             mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], action[i])
+            mujoco_utils.reset_mocap2body_xpos(self.env.model, self.env.data)
 
         action = np.array([0, 0, 0, 0])
 
