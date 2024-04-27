@@ -7,6 +7,8 @@ from gymnasium_robotics.utils import mujoco_utils
 from gymnasium_robotics.envs.fetch.reach import MujocoFetchReachEnv
 from gymnasium.envs.registration import register
 from gymnasium.spaces.discrete import Discrete
+from gymnasium.spaces.box import Box
+from gymnasium.spaces.dict import Dict
 from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
 
 
@@ -16,7 +18,7 @@ class CustomMujocoFetchReachEnv(MujocoFetchReachEnv):
 
     def _set_action(self, action):
         pass
-        #print("gg")
+
 
 register(
     # unique identifier for the env `name-version`
@@ -38,8 +40,8 @@ class FetchReachJointsControl(gym.Env):
             "robot0:shoulder_lift_joint",
             "robot0:upperarm_roll_joint",
             "robot0:elbow_flex_joint",
-            "robot0:forearm_roll_link",
-            "robot0:wrist_flex_link",
+            "robot0:forearm_roll_joint",
+            "robot0:wrist_flex_joint",
             "robot0:wrist_roll_joint"
         ]
         
@@ -68,7 +70,8 @@ class FetchReachJointsControl(gym.Env):
                 self.discrete_actions[i] *= 0.1 / np.linalg.norm(self.discrete_actions[i])
             
         self.action_space = Discrete(len(self.discrete_actions))
-        self.observation_space = self.env.observation_space
+        self.observation_space = Dict({"observation": Box(-np.inf, np.inf, shape=(14,)), "desired_goal": Box(-np.inf, np.inf, shape=(3,))})
+        print(self.observation_space)
 
     def step(self, action):
         if self.record:
@@ -77,21 +80,31 @@ class FetchReachJointsControl(gym.Env):
         x = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[0]
         action = np.array(self.discrete_actions[action])
 
-        #print(x)
         action += x
-        #print(action)
 
-        for i in range(7):            
+        for i in range(7):
             mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], action[i])
         
         mujoco_utils.reset_mocap2body_xpos(self.env.model, self.env.data)
 
-        action = np.array([0, 0, 0, 0])
+        obs, reward, terminated, truncated, info = self.env.step(np.array([0, 0, 0, 0]))
 
-        return self.env.step(action)
+        # update observation and remove achieved_goal
+        temp = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)
+        obs["observation"] = np.concatenate((temp[0], temp[1]))
+        obs.pop("achieved_goal")
+
+        return obs, reward, terminated, truncated, info
     
     def reset(self, **kwargs):
-        return self.env.reset(**kwargs)
+        observation, info = self.env.reset(**kwargs)
+
+        # update observation and remove achieved_goal
+        temp = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)
+        observation["observation"] = np.concatenate((temp[0], temp[1]))
+        observation.pop("achieved_goal")
+
+        return observation, info
     
     def render(self):
         return self.env.render()
