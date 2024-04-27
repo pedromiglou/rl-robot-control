@@ -71,7 +71,6 @@ class FetchReachJointsControl(gym.Env):
             
         self.action_space = Discrete(len(self.discrete_actions))
         self.observation_space = Dict({"observation": Box(-np.inf, np.inf, shape=(14,)), "desired_goal": Box(-np.inf, np.inf, shape=(3,))})
-        print(self.observation_space)
 
     def step(self, action):
         if self.record:
