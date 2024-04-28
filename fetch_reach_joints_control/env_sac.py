@@ -79,7 +79,7 @@ class FetchReachJointsControl(gym.Env):
             if np.linalg.norm(self.discrete_actions[i]) != 0:
                 self.discrete_actions[i] *= 0.1 / np.linalg.norm(self.discrete_actions[i])
             
-        self.action_space = Discrete(len(self.discrete_actions))
+        self.action_space = Box(low=-1, high=1, shape=(7,), dtype=np.float32)
         self.observation_space = Dict({"observation": Box(-np.inf, np.inf, shape=(14,)), "desired_goal": Box(-np.inf, np.inf, shape=(3,))})
 
     def step(self, action):
@@ -87,8 +87,9 @@ class FetchReachJointsControl(gym.Env):
             self.video_recorder.capture_frame()
 
         x = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[0]
-        action = np.array(self.discrete_actions[action])
+        #action = np.array(self.discrete_actions[action])
 
+        action *= 0.1
         action += x
 
         for i in range(7):

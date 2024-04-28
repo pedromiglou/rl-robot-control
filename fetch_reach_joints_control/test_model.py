@@ -6,8 +6,8 @@ from env import FetchReachJointsControl
 
 
 # load env
-env = FetchReachJointsControl(max_episode_steps=50, render_mode="human")
-# env = FetchReachJointsControl(max_episode_steps=50, render_mode="rgb_array", record=True)
+# env = FetchReachJointsControl(max_episode_steps=50, render_mode="human")
+env = FetchReachJointsControl(max_episode_steps=50, render_mode="rgb_array", record=True)
 
 observation, info = env.reset(seed=42)
 
