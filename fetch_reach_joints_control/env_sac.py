@@ -59,7 +59,7 @@ class FetchReachJointsControl(gym.Env):
         if self.record:
             self.video_recorder = VideoRecorder(
                 env=self.env,
-                base_path="./videos/discrete_fetch_reach"
+                base_path="./videos/discrete_fetch_reach_sac"
             )
 
         # set discrete actions
@@ -91,6 +91,11 @@ class FetchReachJointsControl(gym.Env):
 
         action *= 0.1
         action += x
+
+        print(self.env.data.mocap_quat)
+        #print(mujoco_utils.get_mocap_quat(
+        #    self.env.model, self.env.data, "robot0:mocap"
+        #))
 
         for i in range(7):
             mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], action[i])

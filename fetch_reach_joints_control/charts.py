@@ -57,10 +57,10 @@ file_path = './logs/progress.csv'
 df = pd.read_csv(file_path)
 
 # Call the function with the DataFrame
-create_line_chart(df["time/episodes"], df["train/loss"], "Episodes", "Loss", avg_line = True, save_path="./logs/loss.svg")
+#create_line_chart(df["time/episodes"], df["train/loss"], "Episodes", "Loss", avg_line = True, save_path="./logs/loss.svg")
 
 create_line_chart(df["time/episodes"], df["rollout/ep_rew_mean"], "Episodes", "Episode Reward Mean", avg_line = True, save_path="./logs/reward.svg")
 
-create_line_chart(df["time/episodes"], df["rollout/exploration_rate"], "Episodes", "Exploration Rate", save_path="./logs/exploration_rate.svg")
+#create_line_chart(df["time/episodes"], df["rollout/exploration_rate"], "Episodes", "Exploration Rate", save_path="./logs/exploration_rate.svg")
 
 create_line_chart(df["time/episodes"], df["rollout/success_rate"], "Episodes", "Success Rate", avg_line = True, save_path="./logs/success_rate.svg")
