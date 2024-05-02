@@ -6,7 +6,7 @@ import time
 from stable_baselines3 import DQN
 from stable_baselines3.common.logger import configure
 
-from env import FetchReachJointsControl
+from envs.fetch_reach_cartesian.discrete import FetchReachJointsControl
 
 
 # set up logging

@@ -57,7 +57,7 @@ class CustomMujocoFetchReachEnv(MujocoFetchReachEnv):
         # compute the orientation error
         quat_error = np.sum([(q1 - q2) ** 2 for q1, q2 in zip(achieved_goal, desired_goal)]) ** 0.5
         # compute the reward
-        return - pos_error - quat_error > - 0.5 
+        return - pos_error - quat_error > - 0.5
 
     def _render_callback(self):
         # Visualize target.

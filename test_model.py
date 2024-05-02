@@ -2,7 +2,7 @@
 
 from stable_baselines3 import DQN
 
-from env import DiscreteFetchReach
+from envs.fetch_reach_cartesian.discrete import DiscreteFetchReach
 
 
 # load env

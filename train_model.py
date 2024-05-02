@@ -6,17 +6,19 @@ import time
 from stable_baselines3 import SAC
 from stable_baselines3.common.logger import configure
 
-from envs.fetch_reach_joints.continuous import FetchReachJointsControl
+from envs.fetch_reach_cartesian.discrete import FetchReachCartesianDiscrete
 
+
+RESULTS_FOLDER = "./results/fetch_reach_cartesian_discrete"
 
 # set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-env_logger = configure("./logs/", ["stdout", "csv"])
+logging.basicConfig(level=logging.INFO, filename=f'{RESULTS_FOLDER}/logs.log')
+env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 
 # create env
 logger.info("Creating environment...")
-env = FetchReachJointsControl(max_episode_steps=50, render_mode=None)
+env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode=None)
 
 # train model
 logger.info("Starting model training...")
@@ -25,11 +27,11 @@ t1 = time.time()
 observation, info = env.reset(seed=42)
 
 model = SAC("MultiInputPolicy", env, verbose=1)
-# model = SAC.load("sac_fetch_reach")
+# model = DQN.load(f'{RESULTS_FOLDER}/model')
 # model.set_env(env)
 model.set_logger(env_logger)
-model.learn(total_timesteps=1e4, log_interval=20)
-model.save("models/sac_fetch_reach")
+model.learn(total_timesteps=2e6, log_interval=50)
+model.save(f'{RESULTS_FOLDER}/model')
 
 env.close()
 
