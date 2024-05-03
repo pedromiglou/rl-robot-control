@@ -8,7 +8,7 @@ from gymnasium.spaces.dict import Dict
 from gymnasium.spaces.discrete import Discrete
 from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
 
-from utils import distance_between_points
+from envs.fetch_reach_cartesian.utils import distance_between_points
 
 
 class FetchReachCartesianDiscrete(gym.Env):
