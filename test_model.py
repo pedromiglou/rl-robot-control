@@ -2,17 +2,19 @@
 
 from stable_baselines3 import DQN
 
-from envs.fetch_reach_cartesian.discrete import DiscreteFetchReach
+from envs.fetch_reach_cartesian.discrete import FetchReachCartesianDiscrete
 
+
+RESULTS_FOLDER = "./results/fetch_reach_cartesian_discrete"
 
 # load env
-env = DiscreteFetchReach(max_episode_steps=50, render_mode="human")
-# env = DiscreteFetchReach(max_episode_steps=50, render_mode="rgb_array", record=True)
+env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode="human")
+# env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode="rgb_array", record=True)
 
 observation, info = env.reset(seed=42)
 
 # test model
-model = DQN.load("models/dqn_fetch_reach")
+model = DQN.load(f'{RESULTS_FOLDER}/best_model')
 
 observation, info = env.reset()
 for _ in range(500):
