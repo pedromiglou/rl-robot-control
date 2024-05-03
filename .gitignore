@@ -1,3 +1,5 @@
+**/assets/universal_robots_ur10e/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
