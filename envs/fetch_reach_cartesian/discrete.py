@@ -2,13 +2,58 @@
 
 import gymnasium as gym
 import numpy as np
+import os
 
+from gymnasium.envs.registration import register
 from gymnasium.spaces.box import Box
 from gymnasium.spaces.dict import Dict
 from gymnasium.spaces.discrete import Discrete
+from gymnasium.utils.ezpickle import EzPickle
 from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
+from gymnasium_robotics.envs.fetch import MujocoFetchEnv
 
-from envs.fetch_reach_cartesian.utils import distance_between_points
+from utils import point_distance
+
+
+class CustomMujocoFetchReachEnv(MujocoFetchEnv, EzPickle):
+    """
+    This class is needed to overwrite functions in MujocoFetchEnv.
+    """
+    def __init__(self, reward_type: str = "sparse", **kwargs):
+        initial_qpos = {
+            "robot0:slide0": 0.4049,
+            "robot0:slide1": 0.48,
+            "robot0:slide2": 0.0,
+        }
+        MujocoFetchEnv.__init__(
+            self,
+            model_path=os.path.join("fetch", "reach.xml"),
+            has_object=False,
+            block_gripper=True,
+            n_substeps=20,
+            gripper_extra_height=0.2,
+            target_in_the_air=True,
+            target_offset=0.0,
+            obj_range=0.15,
+            target_range=0.15,
+            distance_threshold=0.06,
+            initial_qpos=initial_qpos,
+            reward_type=reward_type,
+            **kwargs,
+        )
+        EzPickle.__init__(self, reward_type=reward_type, **kwargs)
+
+
+# register the custom environment
+register(
+    # unique identifier for the env `name-version`
+    id='FetchReachDense-custom',
+    # path to the class for creating the env
+    # Note: entry_point also accept a class as input (and not only a string)
+    entry_point=CustomMujocoFetchReachEnv,
+    # Max number of steps per episode, using a `TimeLimitWrapper`
+    max_episode_steps=50,
+)
 
 
 class FetchReachCartesianDiscrete(gym.Env):
@@ -17,7 +62,7 @@ class FetchReachCartesianDiscrete(gym.Env):
     """
     def __init__(self, record=False, **kwargs):
         self.env = gym.make(
-            'FetchReachDense-v2',
+            'FetchReachDense-custom',
             reward_type="dense",
             width=720,
             height=720,
@@ -61,7 +106,7 @@ class FetchReachCartesianDiscrete(gym.Env):
     
     def compute_reward(self, obs, Kp=1.0):
         # compute the position error
-        dist = distance_between_points(obs["desired_goal"], obs["observation"][:3])
+        dist = point_distance(obs["desired_goal"], obs["observation"][:3])
         pos_error = (self.reward_info["initial_distance"] - dist) / self.reward_info["initial_distance"] # [-inf, 1]
         # compute the reward
         return Kp * pos_error
@@ -86,7 +131,7 @@ class FetchReachCartesianDiscrete(gym.Env):
 
         obs = self.fix_obs(obs)
 
-        self.reward_info["initial_distance"] = distance_between_points(obs["desired_goal"], obs["observation"][:3])
+        self.reward_info["initial_distance"] = point_distance(obs["desired_goal"], obs["observation"][:3])
 
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
