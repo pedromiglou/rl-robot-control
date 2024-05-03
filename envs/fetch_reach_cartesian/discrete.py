@@ -73,6 +73,8 @@ class FetchReachCartesianDiscrete(gym.Env):
         obs, reward, terminated, truncated, info = self.env.step(self.discrete_actions[action])
 
         obs = self.fix_obs(obs)
+
+        reward = self.compute_reward(obs)
         
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
