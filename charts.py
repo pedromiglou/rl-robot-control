@@ -56,3 +56,18 @@ create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], e
 create_line_chart(train_df["time/episodes"], (train_df["rollout/exploration_rate"],), "Episodes", "Exploration Rate", save_path=f"{RESULTS_FOLDER}/exploration_rate.svg")
 
 create_line_chart(train_df["time/episodes"], (train_df["rollout/success_rate"], eval_df["eval/success_rate"]), "Episodes", "Success Rate", legend=["training success rate", "validation success rate"], save_path=f"{RESULTS_FOLDER}/success_rate.svg")
+
+try:
+    f = open(f"{RESULTS_FOLDER}/joint_values.txt", "r")
+    lines = [[float(n) for n in line.split(",")] for line in f.readlines()[:100]]
+    f.close()
+
+    lines = [[lines[x][y] for x in range(len(lines))] for y in range(len(lines[0]))]
+
+    create_line_chart([t/25 for t in range(len(lines[0]))], lines, "Time", "Joint Velocities",
+                    legend=["shoulder_pan_joint", "shoulder_lift_joint", "upperarm_roll_joint",
+                            "elbow_flex_joint", "forearm_roll_joint", "wrist_flex_joint", "wrist_roll_joint"],
+                            save_path=f"{RESULTS_FOLDER}/joint_values.svg")
+
+except:
+    pass
