@@ -2,24 +2,24 @@
 
 from stable_baselines3 import SAC
 
-from env_sac import FetchReachJointsControl
+from envs.fetch_reach_joints.continuous import FetchReachJointsContinuous
 
+
+RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
 
 # load env
-env = FetchReachJointsControl(max_episode_steps=50, render_mode="human")
-#env = FetchReachJointsControl(max_episode_steps=50, render_mode="rgb_array", record=True)
+env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="human")
+# env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="rgb_array", record=True)
 
 observation, info = env.reset(seed=42)
 
 # test model
-model = SAC.load("models/sac_fetch_reach")
+model = SAC.load(f'{RESULTS_FOLDER}/best_model')
 
 observation, info = env.reset()
 for _ in range(500):
     action, _states = model.predict(observation, deterministic=True)
     observation, reward, terminated, truncated, info = env.step(action)
-
-    #print(env.env.data.__dict__)
 
     if terminated or truncated or info["is_success"]:
         observation, info = env.reset()

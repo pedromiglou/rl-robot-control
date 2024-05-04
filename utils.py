@@ -50,4 +50,12 @@ def random_euler_angles():
     pitch = np.random.uniform(0, 2*np.pi)
     yaw = np.random.uniform(0, 2*np.pi)
 
+    print([roll, pitch, yaw])
+
+    roll, pitch, yaw = (3.4570793849477655, 3.351624046629514, 3.682197036971132)
+
+    #roll = -0.136
+    #pitch = -1.089
+    #yaw = 1.711
+
     return roll, pitch, yaw

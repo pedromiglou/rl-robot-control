@@ -33,6 +33,7 @@
         <mesh file="wrist_flex_link_collision.stl" name="robot0:wrist_flex_link"></mesh>
         <mesh file="wrist_roll_link_collision.stl" name="robot0:wrist_roll_link"></mesh>
         <mesh file="torso_fixed_link.stl" name="robot0:torso_fixed_link"></mesh>
+        <mesh file="arrowmk1.stl" name="robot0:arrowmk1"></mesh>
     </asset>
 
     <equality>
