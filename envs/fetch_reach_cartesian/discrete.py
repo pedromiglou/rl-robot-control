@@ -11,6 +11,7 @@ from gymnasium.spaces.discrete import Discrete
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
 from gymnasium_robotics.envs.fetch import MujocoFetchEnv
+from gymnasium_robotics.utils import mujoco_utils
 
 from utils import point_distance
 
@@ -64,7 +65,7 @@ class FetchReachCartesianDiscrete(gym.Env):
         self.env = gym.make(
             'FetchReachDense-custom',
             reward_type="dense",
-            width=720,
+            width=1280,
             height=720,
             default_camera_config = {
                 "distance": 2.0,
@@ -74,6 +75,18 @@ class FetchReachCartesianDiscrete(gym.Env):
             },
             **kwargs
         )
+
+        self.joint_names = [
+            "robot0:shoulder_pan_joint",
+            "robot0:shoulder_lift_joint",
+            "robot0:upperarm_roll_joint",
+            "robot0:elbow_flex_joint",
+            "robot0:forearm_roll_joint",
+            "robot0:wrist_flex_joint",
+            "robot0:wrist_roll_joint"
+        ]
+
+        self.joint_values_file = open("./results/fetch_reach_cartesian_discrete/joint_values.txt", "w")
 
         self.record = record
         if self.record:
@@ -120,9 +133,16 @@ class FetchReachCartesianDiscrete(gym.Env):
         obs = self.fix_obs(obs)
 
         reward = self.compute_reward(obs)
+
+        joint_values = list(mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[1])
+        self.joint_values_file.write(f"{','.join([str(v) for v in joint_values])}\n")
         
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
+
+            if info["is_success"]: # if the episode is successful, capture more frames
+                for _ in range(10):
+                    self.video_recorder.capture_frame()
 
         return obs, reward, terminated, truncated, info
     
@@ -142,6 +162,7 @@ class FetchReachCartesianDiscrete(gym.Env):
         return self.env.render()
     
     def close(self):
+        self.joint_values_file.close()
         if self.record:
             self.video_recorder.close()
 

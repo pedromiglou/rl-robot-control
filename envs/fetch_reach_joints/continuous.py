@@ -2,62 +2,57 @@
 
 import gymnasium as gym
 import numpy as np
+import os
+import random
 
 from gymnasium.envs.registration import register
 from gymnasium.spaces.box import Box
 from gymnasium.spaces.dict import Dict
+from gymnasium.utils.ezpickle import EzPickle
 from gymnasium.wrappers.monitoring.video_recorder import VideoRecorder
 from gymnasium_robotics.utils import mujoco_utils
-from gymnasium_robotics.envs.fetch.reach import MujocoFetchReachEnv
+from gymnasium_robotics.envs.fetch import MujocoFetchEnv
+
+from utils import euler_to_quaternion, point_distance, random_euler_angles
 
 
-def random_euler_angles():
-    # Generate random angles for roll, pitch, and yaw
-    roll = np.random.uniform(0, 2*np.pi)
-    pitch = np.random.uniform(0, 2*np.pi)
-    yaw = np.random.uniform(0, 2*np.pi)
-
-    return roll, pitch, yaw
-
-
-def euler_to_quaternion(roll, pitch, yaw):
+class CustomMujocoFetchReachEnv(MujocoFetchEnv, EzPickle):
     """
-    Convert Euler angles (roll, pitch, yaw) to a quaternion.
-
-    Parameters:
-    - roll: Roll angle in radians.
-    - pitch: Pitch angle in radians.
-    - yaw: Yaw angle in radians.
-
-    Returns:
-    - quaternion: Tuple containing the quaternion (w, x, y, z).
+    This class is needed to overwrite functions in MujocoFetchEnv.
     """
-    cy = np.cos(yaw * 0.5)
-    sy = np.sin(yaw * 0.5)
-    cp = np.cos(pitch * 0.5)
-    sp = np.sin(pitch * 0.5)
-    cr = np.cos(roll * 0.5)
-    sr = np.sin(roll * 0.5)
-
-    w = cr * cp * cy + sr * sp * sy
-    x = sr * cp * cy - cr * sp * sy
-    y = cr * sp * cy + sr * cp * sy
-    z = cr * cp * sy - sr * sp * cy
-
-    return w, x, y, z
-
-
-class CustomMujocoFetchReachEnv(MujocoFetchReachEnv):
-    """
-    This class is needed to overwrite functions in MujocoFetchReachEnv.
-    """
+    def __init__(self, reward_type: str = "sparse", **kwargs):
+        initial_qpos = {
+            "robot0:slide0": 0.4049,
+            "robot0:slide1": 0.48,
+            "robot0:slide2": 0.0,
+        }
+        MujocoFetchEnv.__init__(
+            self,
+            model_path=os.path.join(os.path.dirname(__file__), "assets/reach.xml"),
+            #model_path=os.path.join(os.path.dirname(__file__), "assets/universal_robots_ur10e/ur10e.xml"),
+            has_object=False,
+            block_gripper=True,
+            n_substeps=20,
+            gripper_extra_height=0.2,
+            target_in_the_air=True,
+            target_offset=0.0,
+            obj_range=0.15,
+            target_range=0.15,
+            distance_threshold=0.05,
+            initial_qpos=initial_qpos,
+            reward_type=reward_type,
+            **kwargs,
+        )
+        EzPickle.__init__(self, reward_type=reward_type, **kwargs)
+    
     def _is_success(self, achieved_goal, desired_goal):
+        return False
         # compute the position error
-        pos_error = np.sum([(p1 - p2) ** 2 for p1, p2 in zip(achieved_goal, desired_goal)]) ** 0.5
+        #pos_error = point_distance(achieved_goal[:3], desired_goal[:3])
         # compute the orientation error
-        quat_error = np.sum([(q1 - q2) ** 2 for q1, q2 in zip(achieved_goal, desired_goal)]) ** 0.5
+        #quat_error = point_distance(achieved_goal[3:], desired_goal[3:]) # to replace
         # compute the reward
-        return - pos_error - quat_error > - 0.5
+        #return - pos_error - quat_error > - 0.5 # to replace
 
     def _render_callback(self):
         # Visualize target.
@@ -66,12 +61,21 @@ class CustomMujocoFetchReachEnv(MujocoFetchReachEnv):
             self.model, self._mujoco.mjtObj.mjOBJ_SITE, "target0"
         )
         self.model.site_pos[site_id] = self.goal[:3] - sites_offset[0]
+        self.model.site_quat[site_id] = self.goal[3:]
         self._mujoco.mj_forward(self.model, self.data)
     
     def _sample_goal(self):
         goal_pos = super()._sample_goal()
-        goal_quat = euler_to_quaternion(*random_euler_angles())
-        return np.concatenate([goal_pos, goal_quat])
+        # goal_quat = euler_to_quaternion(*random_euler_angles())
+        possible_quats = [
+            [0,0,1,0],
+            [0,0.114,0.987,0.114],
+            [0,0.114,0.987,-0.114],
+            [0,-0.114,0.987,0.114],
+            [0,-0.114,0.987,-0.114],
+        ]
+        goal_quat = random.choice(possible_quats)
+        return np.concatenate((goal_pos, goal_quat))
     
     def _set_action(self, action):
         pass
@@ -92,7 +96,7 @@ register(
 )
 
 
-class FetchReachJointsControl(gym.Env):
+class FetchReachJointsContinuous(gym.Env):
     """
     Gymanasium environment wrapper
     """
@@ -100,7 +104,7 @@ class FetchReachJointsControl(gym.Env):
         self.env = gym.make(
             'FetchReachDense-custom',
             reward_type="dense",
-            width=720,
+            width=1280,
             height=720,
             default_camera_config = {
                 "distance": 2.0,
@@ -108,6 +112,7 @@ class FetchReachJointsControl(gym.Env):
                 "elevation": -14.0,
                 "lookat": np.array([1.3, 0.75, 0.55])
             },
+            #model_path="./assets/reach.xml",
             **kwargs
         )
 
@@ -144,11 +149,15 @@ class FetchReachJointsControl(gym.Env):
     
     def compute_reward(self, obs, Kp=1.0, Ko=1.0):
         # compute the position error
-        pos_error = np.sum([(p1 - p2) ** 2 for p1, p2 in zip(obs["desired_goal"][:3], self.env.data.mocap_pos)]) ** 0.5
+        pos_error = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
+        pos_reward = (self.reward_info["initial_distance"] - pos_error) / self.reward_info["initial_distance"] # [-inf, 1]
+        
         # compute the orientation error
-        quat_error = np.sum([(q1 - q2) ** 2 for q1, q2 in zip(obs["desired_goal"][3:], self.env.data.mocap_quat)]) ** 0.5
+        quat_error = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
+        quat_reward = 1 - quat_error / self.reward_info["max_quat_error"] # [-inf, 1]
+
         # compute the reward
-        reward = -Kp * pos_error - Ko * quat_error
+        reward = Kp * pos_reward + Ko * quat_reward
         return reward
 
     def step(self, action):
@@ -175,6 +184,10 @@ class FetchReachJointsControl(gym.Env):
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
 
+            if info["is_success"]: # if the task is completed, capture more frames
+                for _ in range(10):
+                    self.video_recorder.capture_frame()
+
         return obs, reward, terminated, truncated, info
     
     def reset(self, **kwargs):
@@ -182,8 +195,8 @@ class FetchReachJointsControl(gym.Env):
 
         obs = self.fix_obs(obs)
 
-        self.reward_info["max_pos_error"] = (sum((p1 - p2) ** 2 for p1, p2 in zip(obs["desired_goal"][:3], self.env.data.mocap_pos)))**0.5
-        self.reward_info["max_quat_error"] = (sum((q1 - q2) ** 2 for q1, q2 in zip(obs["desired_goal"][3:], self.env.data.mocap_quat)))**0.5
+        self.reward_info["initial_distance"] = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
+        self.reward_info["max_quat_error"] = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
 
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()

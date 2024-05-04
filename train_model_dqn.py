@@ -22,7 +22,7 @@ logger.info("Creating environment...")
 env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode=None)
 eval_env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode=None)
 
-# Stop training if there is no improvement after more than 3 evaluations
+# Stop training if there is no improvement after more than 10 evaluations
 logger.info("Setting up callbacks...")
 stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=10, min_evals=5, verbose=1)
 eval_callback = EvalCallback(eval_env, eval_freq=500*50, n_eval_episodes=50, callback_after_eval=stop_train_callback, verbose=1, best_model_save_path=RESULTS_FOLDER)

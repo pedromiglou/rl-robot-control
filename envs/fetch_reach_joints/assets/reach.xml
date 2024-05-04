@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mujoco>
-	<compiler angle="radian" coordinate="local" meshdir="../stls/fetch" texturedir="../textures"></compiler>
+	<compiler angle="radian" coordinate="local" meshdir="./stls" texturedir="./textures"></compiler>
 	<option timestep="0.002">
 		<flag warmstart="enable"></flag>
 	</option>
@@ -10,7 +10,9 @@
 	<worldbody>
 		<geom name="floor0" pos="0.8 0.75 0" size="0.85 0.7 1" type="plane" condim="3" material="floor_mat"></geom>
 		<body name="floor0" pos="0.8 0.75 0">
-			<site name="target0" pos="0 0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere"></site>
+			<!--<geom mesh="robot0:arrowmk1" name="target0" material="robot0:head_mat" class="robot0:grey" size="0.02 0.04 0.02"></geom>-->
+			<site name="target0" pos="0 0 0.5" size="0.02 0.04 0.02" rgba="1 0 0 1" type="cylinder">
+			</site>
 		</body>
 
 		<include file="robot.xml"></include>
