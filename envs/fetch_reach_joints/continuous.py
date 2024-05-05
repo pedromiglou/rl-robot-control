@@ -154,7 +154,7 @@ class FetchReachJointsContinuous(gym.Env):
         
         # compute the orientation error
         quat_error = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
-        quat_reward = 1 - quat_error / self.reward_info["max_quat_error"] # [-inf, 1]
+        quat_reward = 1 - quat_error / 2 # [0, 1]
 
         # compute the reward
         reward = Kp * pos_reward + Ko * quat_reward
@@ -196,7 +196,7 @@ class FetchReachJointsContinuous(gym.Env):
         obs = self.fix_obs(obs)
 
         self.reward_info["initial_distance"] = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
-        self.reward_info["max_quat_error"] = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
+        #self.reward_info["max_quat_error"] = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
 
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
