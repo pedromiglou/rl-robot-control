@@ -130,7 +130,7 @@ class FetchReachJointsContinuous(gym.Env):
         if self.record:
             self.video_recorder = VideoRecorder(
                 env=self.env,
-                base_path="./videos/discrete_fetch_reach_sac"
+                base_path="./results/fetch_reach_joints_continuous/demo"
             )
 
         # action space: movements of the seven joints

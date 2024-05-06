@@ -8,8 +8,8 @@ from envs.fetch_reach_joints.continuous import FetchReachJointsContinuous
 RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
 
 # load env
-env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="human")
-# env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="rgb_array", record=True)
+# env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="human")
+env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="rgb_array", record=True)
 
 observation, info = env.reset(seed=42)
 
