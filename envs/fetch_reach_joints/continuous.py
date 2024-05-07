@@ -28,8 +28,7 @@ class CustomMujocoFetchReachEnv(MujocoFetchEnv, EzPickle):
         }
         MujocoFetchEnv.__init__(
             self,
-            model_path=os.path.join(os.path.dirname(__file__), "assets/reach.xml"),
-            #model_path=os.path.join(os.path.dirname(__file__), "assets/universal_robots_ur10e/ur10e.xml"),
+            model_path=os.path.join(os.path.dirname(__file__), "model/reach.xml"),
             has_object=False,
             block_gripper=True,
             n_substeps=20,
@@ -117,13 +116,12 @@ class FetchReachJointsContinuous(gym.Env):
         )
 
         self.joint_names = [
-            "robot0:shoulder_pan_joint",
-            "robot0:shoulder_lift_joint",
-            "robot0:upperarm_roll_joint",
-            "robot0:elbow_flex_joint",
-            "robot0:forearm_roll_joint",
-            "robot0:wrist_flex_joint",
-            "robot0:wrist_roll_joint"
+            "shoulder_pan_joint",
+            "shoulder_lift_joint",
+            "elbow_joint",
+            "wrist_1_joint",
+            "wrist_2_joint",
+            "wrist_3_joint"
         ]
         
         self.record = record
@@ -134,17 +132,23 @@ class FetchReachJointsContinuous(gym.Env):
             )
 
         # action space: movements of the seven joints
-        self.action_space = Box(low=-1, high=1, shape=(7,), dtype=np.float32)
+        self.action_space = Box(low=-1, high=1, shape=(6,), dtype=np.float32)
 
         # observation space: joint positions, velocities, and target position
-        self.observation_space = Dict({"observation": Box(-np.inf, np.inf, shape=(14,)), "desired_goal": Box(-np.inf, np.inf, shape=(7,))})
+        self.observation_space = Dict({"observation": Box(-np.inf, np.inf, shape=(12,)), "desired_goal": Box(-np.inf, np.inf, shape=(7,))})
 
         # create a dict to store relevant info for the reward function
         self.reward_info = {}
     
     def fix_obs(self, obs):
-        obs["observation"] = np.concatenate(mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names))
+        #print(obs)
+        obs["observation"] = []
+        for i in range(6):
+            obs["observation"].append(mujoco_utils.get_joint_qpos(self.env.model, self.env.data, self.joint_names[i])[0])
+            obs["observation"].append(mujoco_utils.get_joint_qvel(self.env.model, self.env.data, self.joint_names[i])[0])
+        #obs["observation"] = np.concatenate(mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names))
         obs.pop("achieved_goal")
+        print(obs)
         return obs
     
     def compute_reward(self, obs, Kp=1.0, Ko=1.0):
@@ -168,9 +172,13 @@ class FetchReachJointsContinuous(gym.Env):
         action *= 0.1
 
         # update the joint positions
-        new_joint_pos = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[0] + action
+        current_joint_pos = []
+        for i in range(6):
+            current_joint_pos.append(mujoco_utils.get_joint_qpos(self.env.model, self.env.data, self.joint_names[i])[0])
+        #new_joint_pos = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[0] + action
+        new_joint_pos = np.array(current_joint_pos) + action
         
-        for i in range(7):
+        for i in range(6):
             mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], new_joint_pos[i])
         
         mujoco_utils.reset_mocap2body_xpos(self.env.model, self.env.data)
