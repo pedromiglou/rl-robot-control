@@ -51,7 +51,7 @@ train_df = df.iloc[1::2]
 # Call the function with the DataFrame
 create_line_chart(train_df["time/episodes"], (eval_df["train/loss"],), "Episodes", "Loss", save_path=f"{RESULTS_FOLDER}/loss.svg")
 
-create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
+create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean (50 max)", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
 
 create_line_chart(train_df["time/episodes"], (train_df["rollout/exploration_rate"],), "Episodes", "Exploration Rate", save_path=f"{RESULTS_FOLDER}/exploration_rate.svg")
 
@@ -64,7 +64,7 @@ try:
 
     lines = [[lines[x][y] for x in range(len(lines))] for y in range(len(lines[0]))]
 
-    create_line_chart([t/25 for t in range(len(lines[0]))], lines, "Time", "Joint Velocities",
+    create_line_chart([t/25 for t in range(len(lines[0]))], lines, "Time (s)", "Joint Velocities (rad/s)",
                     legend=["shoulder_pan_joint", "shoulder_lift_joint", "upperarm_roll_joint",
                             "elbow_flex_joint", "forearm_roll_joint", "wrist_flex_joint", "wrist_roll_joint"],
                             save_path=f"{RESULTS_FOLDER}/joint_values.svg")
