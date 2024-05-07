@@ -111,7 +111,6 @@ class FetchReachJointsContinuous(gym.Env):
                 "elevation": -14.0,
                 "lookat": np.array([1.3, 0.75, 0.55])
             },
-            #model_path="./assets/reach.xml",
             **kwargs
         )
 
@@ -137,24 +136,22 @@ class FetchReachJointsContinuous(gym.Env):
         # observation space: joint positions, velocities, and target position
         self.observation_space = Dict({"observation": Box(-np.inf, np.inf, shape=(12,)), "desired_goal": Box(-np.inf, np.inf, shape=(7,))})
 
-        # create a dict to store relevant info for the reward function
-        self.reward_info = {}
+        # store initial distance for reward computation
+        self.initial_distance = None
     
     def fix_obs(self, obs):
-        #print(obs)
-        obs["observation"] = []
+        obs["observation"] = np.array([])
         for i in range(6):
-            obs["observation"].append(mujoco_utils.get_joint_qpos(self.env.model, self.env.data, self.joint_names[i])[0])
-            obs["observation"].append(mujoco_utils.get_joint_qvel(self.env.model, self.env.data, self.joint_names[i])[0])
-        #obs["observation"] = np.concatenate(mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names))
+            obs["observation"] = np.append(obs["observation"], mujoco_utils.get_joint_qpos(self.env.model, self.env.data, self.joint_names[i])[0])
+            obs["observation"] = np.append(obs["observation"], mujoco_utils.get_joint_qvel(self.env.model, self.env.data, self.joint_names[i])[0])
+
         obs.pop("achieved_goal")
-        print(obs)
         return obs
     
     def compute_reward(self, obs, Kp=1.0, Ko=1.0):
         # compute the position error
         pos_error = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
-        pos_reward = (self.reward_info["initial_distance"] - pos_error) / self.reward_info["initial_distance"] # [-inf, 1]
+        pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
         
         # compute the orientation error
         quat_error = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
@@ -172,10 +169,10 @@ class FetchReachJointsContinuous(gym.Env):
         action *= 0.1
 
         # update the joint positions
-        current_joint_pos = []
+        current_joint_pos = np.array([])
         for i in range(6):
-            current_joint_pos.append(mujoco_utils.get_joint_qpos(self.env.model, self.env.data, self.joint_names[i])[0])
-        #new_joint_pos = mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[0] + action
+            current_joint_pos = np.append(current_joint_pos, mujoco_utils.get_joint_qpos(self.env.model, self.env.data, self.joint_names[i])[0])
+
         new_joint_pos = np.array(current_joint_pos) + action
         
         for i in range(6):
@@ -203,8 +200,7 @@ class FetchReachJointsContinuous(gym.Env):
 
         obs = self.fix_obs(obs)
 
-        self.reward_info["initial_distance"] = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
-        #self.reward_info["max_quat_error"] = 1 - np.dot(obs["desired_goal"][3:], self.env.data.mocap_quat[0])
+        self.initial_distance = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
 
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
