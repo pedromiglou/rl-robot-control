@@ -19,7 +19,7 @@ env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 
 # create env
 logger.info("Creating environment...")
-env = FetchReachJointsContinuous(max_episode_steps=50, render_mode=None)
+env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="human")
 eval_env = FetchReachJointsContinuous(max_episode_steps=50, render_mode=None)
 
 # Stop training if there is no improvement after more than 3 evaluations
