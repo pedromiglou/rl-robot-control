@@ -51,7 +51,7 @@ train_df = df.iloc[1::2]
 # Call the function with the DataFrame
 # create_line_chart(train_df["time/episodes"], (eval_df["train/loss"],), "Episodes", "Loss", save_path=f"{RESULTS_FOLDER}/loss.svg")
 
-create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
+create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean (Max 100)", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
 
 # create_line_chart(train_df["time/episodes"], (train_df["rollout/exploration_rate"],), "Episodes", "Exploration Rate", save_path=f"{RESULTS_FOLDER}/exploration_rate.svg")
 
