@@ -59,12 +59,13 @@ class CustomMujocoFetchReachEnv(MujocoFetchEnv, EzPickle):
         site_id = self._mujoco.mj_name2id(
             self.model, self._mujoco.mjtObj.mjOBJ_SITE, "target0"
         )
-        self.model.site_pos[site_id] = self.goal[:3] - sites_offset[0]
+        self.model.site_pos[site_id] = self.goal[:3]# - sites_offset[0]
         self.model.site_quat[site_id] = self.goal[3:]
         self._mujoco.mj_forward(self.model, self.data)
     
     def _sample_goal(self):
-        goal_pos = super()._sample_goal()
+        #goal_pos = super()._sample_goal()
+        goal_pos = np.array([0, 0, 1])
         # goal_quat = euler_to_quaternion(*random_euler_angles())
         possible_quats = [
             [0,0,1,0],
@@ -106,10 +107,10 @@ class FetchReachJointsContinuous(gym.Env):
             width=1280,
             height=720,
             default_camera_config = {
-                "distance": 2.0,
+                "distance": 2.3,
                 "azimuth": 132.0,
-                "elevation": -14.0,
-                "lookat": np.array([1.3, 0.75, 0.55])
+                "elevation": -10.0,
+                "lookat": np.array([0, 0, 1])
             },
             **kwargs
         )
@@ -197,6 +198,11 @@ class FetchReachJointsContinuous(gym.Env):
     
     def reset(self, **kwargs):
         obs, info = self.env.reset(**kwargs)
+
+        start = [0.01725006103515625, -1.9415461025633753, 1.8129728476153772, -1.5927173099913539, -1.5878670851336878, 0.03150486946105957]
+
+        for i in range(6):
+            mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], start[i])
 
         obs = self.fix_obs(obs)
 
