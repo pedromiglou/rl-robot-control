@@ -28,7 +28,7 @@ class CustomMujocoFetchReachEnv(MujocoFetchEnv, EzPickle):
         }
         MujocoFetchEnv.__init__(
             self,
-            model_path=os.path.join(os.path.dirname(__file__), "model/reach.xml"),
+            model_path=os.path.join(os.path.dirname(__file__), "model/env.xml"),
             has_object=False,
             block_gripper=True,
             n_substeps=20,
