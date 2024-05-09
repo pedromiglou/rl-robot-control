@@ -1,5 +1,6 @@
 ================================================================================
-License for the UR10e mujoco model (./ur10e.xml and ./meshes/ur10e)
+License for the UR10e mujoco model (./ur10e_body.xml, ur10e_config.xml and
+./meshes/ur10e/)
 ================================================================================
 
 Copyright 2018 ROS Industrial Consortium
@@ -31,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ================================================================================
-License for the 2f-140 gripper mujoco model (./robotiq_gripper_140.xml and
-./meshes/robotiq_140_gripper)
+License for the 2f-140 gripper mujoco model (./robotiq_2f_140_body.xml,
+./robotiq_2f_140_config.xml and ./meshes/robotiq_2f_140/)
 ================================================================================
 
 MIT License
