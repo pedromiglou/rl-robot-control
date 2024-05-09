@@ -149,7 +149,8 @@ class FetchReachJointsContinuous(gym.Env):
         obs.pop("achieved_goal")
         return obs
     
-    def compute_reward(self, obs, Kp=1.0, Ko=1.0):
+    def compute_reward(self, obs, Kp=1.0, Ko=0.25):
+        print(self.env.data.mocap_pos[0])
         # compute the position error
         pos_error = point_distance(obs["desired_goal"][:3], self.env.data.mocap_pos[0])
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
@@ -203,6 +204,8 @@ class FetchReachJointsContinuous(gym.Env):
 
         for i in range(6):
             mujoco_utils.set_joint_qpos(self.env.model, self.env.data, self.joint_names[i], start[i])
+
+        self.render()
 
         obs = self.fix_obs(obs)
 
