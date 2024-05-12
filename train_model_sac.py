@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import gymnasium as gym
 import logging
 import time
 
@@ -7,7 +8,7 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnNoModelImprovement
 from stable_baselines3.common.logger import configure
 
-from envs.fetch_reach_joints.continuous import FetchReachJointsContinuous
+import envs.fetch_reach_joints.continuous
 
 
 RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
@@ -19,8 +20,8 @@ env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 
 # create env
 logger.info("Creating environment...")
-env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="human")
-eval_env = FetchReachJointsContinuous(max_episode_steps=50, render_mode=None)
+env = gym.make("Larcc", max_episode_steps=50)#, render_mode="human")
+eval_env = gym.make("Larcc", max_episode_steps=50)
 
 # Stop training if there is no improvement after more than 3 evaluations
 logger.info("Setting up callbacks...")
