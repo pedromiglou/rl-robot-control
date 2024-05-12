@@ -7,7 +7,6 @@ import random
 from gymnasium.envs.registration import register
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium_robotics.envs.robot_env import MujocoRobotEnv
-from gymnasium_robotics.utils import rotations
 
 from utils import euler_to_quaternion, point_distance, random_euler_angles
 
@@ -21,6 +20,10 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # store initial distance for reward computation
         self.initial_distance = None
+
+        # store relevant vlues for goal generation
+        self.table_pos = np.array([0.1, -0.05, 0.38])
+        self.table_size = np.array([1.5, 1, 0.76])
 
         self.joint_names = [
             "shoulder_pan_joint",
@@ -42,7 +45,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         MujocoRobotEnv.__init__(
             self,
-            model_path=os.path.join(os.path.dirname(__file__), "model/env.xml"),
+            model_path=os.path.join(os.path.dirname(__file__), "models/env.xml"),
             initial_qpos={ k: v for k,v in zip(self.joint_names, self.initial_joint_values) },
             n_actions=6,
             n_substeps=20,
@@ -124,9 +127,12 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             "desired_goal": self.goal
         }
 
-    def _sample_goal(self): #TODO rewrite everything
-        #goal_pos = super()._sample_goal()
-        goal_pos = np.array([0, 0, 1])
+    def _sample_goal(self):
+        goal_pos = np.array([
+            self.table_pos[0] + random.uniform(-self.table_size[0]/2, self.table_size[0]/2),
+            self.table_pos[1] + random.uniform(-self.table_size[1]/2, self.table_size[1]/2),
+            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.5)
+        ])
         self.initial_distance = point_distance(self.get_eef()[:3], goal_pos)
 
         # goal_quat = euler_to_quaternion(*random_euler_angles())
