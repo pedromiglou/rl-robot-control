@@ -8,7 +8,7 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnNoModelImprovement
 from stable_baselines3.common.logger import configure
 
-import envs.fetch_reach_joints.continuous
+import envs.larcc_joints_continuous.env
 
 
 RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"

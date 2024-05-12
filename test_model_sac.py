@@ -3,7 +3,7 @@
 import gymnasium as gym
 from stable_baselines3 import SAC
 
-import envs.fetch_reach_joints.continuous
+import envs.larcc_joints_continuous.env
 
 
 RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
