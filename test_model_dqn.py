@@ -2,7 +2,7 @@
 
 from stable_baselines3 import DQN
 
-from envs.fetch_reach_cartesian.discrete import FetchReachCartesianDiscrete
+from envs.fetch_reach_cartesian_discrete.env import FetchReachCartesianDiscrete
 
 
 RESULTS_FOLDER = "./results/fetch_reach_cartesian_discrete"
