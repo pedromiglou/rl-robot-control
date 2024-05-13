@@ -20,7 +20,7 @@ env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 # create env
 logger.info("Creating environment...")
 env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode=None)
-eval_env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode=None)
+eval_env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode=None, deterministic=True)
 
 # Stop training if there is no improvement after more than 10 evaluations
 logger.info("Setting up callbacks...")
