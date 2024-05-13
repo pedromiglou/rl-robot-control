@@ -63,12 +63,11 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         EzPickle.__init__(self, reward_type="dense", **kwargs)
     
     def get_eef(self):
-        site_id = self._mujoco.mj_name2id(
-            self.model, self._mujoco.mjtObj.mjOBJ_SITE, "grip_site"
+        body_id = self._mujoco.mj_name2id(
+            self.model, self._mujoco.mjtObj.mjOBJ_BODY, "eef"
         )
 
-        # there should be a better way to get the quaternion
-        return np.concatenate((self.data.site_xpos[site_id], self.data.mocap_quat[0]))
+        return np.concatenate((self.data.xpos[body_id], self.data.xquat[body_id]))
 
     # GoalEnv methods
     # ----------------------------
@@ -79,7 +78,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
 
         # compute the orientation error
-        quat_error = 1 - np.dot(goal[3:], achieved_goal[3:])
+        quat_error = 1 - max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
         quat_reward = 1 - quat_error / 2 # [0, 1]
 
         # compute the reward
@@ -160,11 +159,11 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
     def _render_callback(self):
         # Visualize target.
-        site_id = self._mujoco.mj_name2id(
-            self.model, self._mujoco.mjtObj.mjOBJ_SITE, "target0"
+        body_id = self._mujoco.mj_name2id(
+            self.model, self._mujoco.mjtObj.mjOBJ_BODY, "target0"
         )
-        self.model.site_pos[site_id] = self.goal[:3]# - sites_offset[0]
-        self.model.site_quat[site_id] = self.goal[3:]
+        self.model.body_pos[body_id] = self.goal[:3]
+        self.model.body_quat[body_id] = self.goal[3:]
         self._mujoco.mj_forward(self.model, self.data)
 
     def _reset_sim(self):
