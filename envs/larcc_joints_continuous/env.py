@@ -151,13 +151,12 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         return (d < self.distance_threshold).astype(np.float32)
 
     def _step_callback(self):
-        pass
         # function to apply additional constraints on the simulation
         # some constraint
         #....#
 
         # update
-        # self._mujoco.mj_forward(self.model, self.data)    
+        self._mujoco.mj_forward(self.model, self.data)    
 
     def _render_callback(self):
         # Visualize target.

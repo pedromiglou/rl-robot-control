@@ -25,7 +25,7 @@ eval_env = gym.make("Larcc", max_episode_steps=50)
 
 # Stop training if there is no improvement after more than 3 evaluations
 logger.info("Setting up callbacks...")
-stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=3, min_evals=2, verbose=1)
+stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=5, min_evals=2, verbose=1)
 eval_callback = EvalCallback(eval_env, eval_freq=500*50, n_eval_episodes=50, callback_after_eval=stop_train_callback, verbose=1, best_model_save_path=RESULTS_FOLDER)
 
 # train model
