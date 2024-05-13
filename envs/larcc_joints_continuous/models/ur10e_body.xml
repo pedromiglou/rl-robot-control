@@ -1,11 +1,4 @@
 <mujoco>
-  <body mocap="true" name="robot0:mocap" pos="0 0 0">
-    <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.7" size="0.005 0.005 0.005" type="box"></geom>
-    <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.1" size="1 0.005 0.005" type="box"></geom>
-    <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.1" size="0.005 1 0.001" type="box"></geom>
-    <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.1" size="0.005 0.005 1" type="box"></geom>
-  </body>
-  <light name="spotlight" mode="targetbodycom" target="wrist_2_link" pos="0 -1 2"/>
   <body name="base" pos="0.100 0.950 0.780" quat="-0.707 0.000 0.000 0.707" childclass="ur10e">
     <inertial mass="4.0" pos="0 0 0" diaginertia="0.0061063308908 0.0061063308908 0.01125"/>
     <geom mesh="base_0" material="black" class="visual"/>
@@ -58,10 +51,9 @@
                 <joint name="wrist_3_joint" class="size2"/>
                 <geom material="linkgray" mesh="wrist3" class="visual"/>
                 <geom class="eef_collision" pos="0 0.097 0" quat="1 1 0 0" size="0.046 0.02"/>
-                <site name="attachment_site" pos="0 0.1 0" quat="-1 1 0 0"/>
-                <body name="tool0_link" pos="0 0.12 0" quat="1 -1 0 0 ">
-                  <geom name="sensor_b" pos="0 0 0.01" size="0.04 0.04 0.01" rgba="0.0118 0.5176 0.6706 1" type="cylinder"/>
-                  <body name="sensor_b_end" pos="0 0 0.02" quat="1 0 0 0 ">
+                <body name="tool0_link" pos="0 0.115 0" quat="1 -1 0 0 ">
+                  <geom name="blue_sensor" pos="0 0 0.025" size="0.04 0.025" rgba="0.0118 0.5176 0.6706 1" type="cylinder"/>
+                  <body name="blue_sensor_end" pos="0 0 0.05" quat="1 0 0 0">
                     <include file="robotiq_2f_140_body.xml"></include>
                   </body>
                 </body>
