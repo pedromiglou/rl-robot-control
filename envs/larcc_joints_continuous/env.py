@@ -22,8 +22,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         self.initial_distance = None
 
         # store relevant vlues for goal generation
-        self.table_pos = np.array([0.1, -0.05, 0.38])
-        self.table_size = np.array([1.5, 1, 0.76])
+        self.table_pos = np.array([0.1, 0.16, 0.38])
+        self.table_size = np.array([1.2, 0.68, 0.76])
 
         self.joint_names = [
             "shoulder_pan_joint",
