@@ -35,12 +35,12 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         ]
 
         self.initial_joint_values = [
-            -0.0023272673236292007,
-            -1.7968598804869593,
-            1.5711200873004358,
-            -1.4860928815654297,
-            -1.6272171179400843,
-            -0.07619315782655889
+            -0.004053417836324513,
+            -1.7941252193846644,
+            1.5798662344561976,
+            -1.4848967355540772,
+            -1.63149339357485,
+            -0.07133704820741826
         ]
 
         MujocoRobotEnv.__init__(
@@ -119,6 +119,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # achieved_goal
         achieved_goal = self.get_eef()
+
+        print(achieved_goal)
 
         return {
             "observation": observation,
