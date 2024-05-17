@@ -120,8 +120,6 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         # achieved_goal
         achieved_goal = self.get_eef()
 
-        print(achieved_goal)
-
         return {
             "observation": observation,
             "achieved_goal": achieved_goal,
@@ -131,20 +129,18 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def _sample_goal(self):
         goal_pos = np.array([
             self.table_pos[0] + random.uniform(-self.table_size[0]/2, self.table_size[0]/2),
-            self.table_pos[1] + random.uniform(-self.table_size[1]/2, self.table_size[1]/2),
-            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.5)
+            self.table_pos[1] + random.uniform(-self.table_size[1]/2+0.15, self.table_size[1]/2),
+            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.4)
         ])
         self.initial_distance = point_distance(self.get_eef()[:3], goal_pos)
 
-        # goal_quat = euler_to_quaternion(*random_euler_angles())
-        possible_quats = [
-            [0,0,1,0],
-            [0,0.114,0.987,0.114],
-            [0,0.114,0.987,-0.114],
-            [0,-0.114,0.987,0.114],
-            [0,-0.114,0.987,-0.114],
-        ]
-        goal_quat = random.choice(possible_quats)
+        while True:
+            w, x, y, z = euler_to_quaternion(*random_euler_angles())
+
+            if 1 - 2 * (x**2 + y**2) < -0.5: # sin(30 degrees)
+                goal_quat = [w, x, y, z]
+                break
+
         return np.concatenate((goal_pos, goal_quat))
 
     def _is_success(self, achieved_goal, desired_goal):
