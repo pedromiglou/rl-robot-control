@@ -14,12 +14,14 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.05, **kwargs):
+    def __init__(self, distance_threshold=0.05, kp=1.0, ko=0.0, **kwargs):
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
-        # store initial distance for reward computation
+        # store initial distance and weights for reward computation
         self.initial_distance = None
+        self.kp = kp
+        self.ko = ko
 
         # store relevant vlues for goal generation
         self.table_pos = np.array([0.1, 0.16, 0.38])
@@ -72,7 +74,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     # GoalEnv methods
     # ----------------------------
 
-    def compute_reward(self, achieved_goal, goal, info, Kp=1.0, Ko=0.25):
+    def compute_reward(self, achieved_goal, goal, info):
         # compute the position error
         pos_error = point_distance(goal[:3], achieved_goal[:3])
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
@@ -82,7 +84,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         quat_reward = 1 - quat_error / 2 # [0, 1]
 
         # compute the reward
-        return Kp * pos_reward + Ko * quat_reward
+        return self.Kp * pos_reward + self.Ko * quat_reward
 
     # RobotEnv methods
     # ----------------------------

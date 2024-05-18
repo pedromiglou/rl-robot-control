@@ -15,7 +15,7 @@ env = gym.make("Larcc", max_episode_steps=50, render_mode="human")
 observation, info = env.reset(seed=42)
 
 # test model
-model = SAC.load(f'{RESULTS_FOLDER}/final_model')
+model = SAC.load(f'{RESULTS_FOLDER}/best_model')
 
 observation, info = env.reset()
 for _ in range(500):
