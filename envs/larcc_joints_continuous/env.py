@@ -84,7 +84,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         quat_reward = 1 - quat_error / 2 # [0, 1]
 
         # compute the reward
-        return self.Kp * pos_reward + self.Ko * quat_reward
+        return self.kp * pos_reward + self.ko * quat_reward
 
     # RobotEnv methods
     # ----------------------------
