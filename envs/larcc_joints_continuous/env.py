@@ -5,6 +5,7 @@ import os
 import random
 
 from gymnasium.envs.registration import register
+from gymnasium.spaces import Box, Dict
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium_robotics.envs.robot_env import MujocoRobotEnv
 
@@ -49,7 +50,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             self,
             model_path=os.path.join(os.path.dirname(__file__), "models/env.xml"),
             initial_qpos={ k: v for k,v in zip(self.joint_names, self.initial_joint_values) },
-            n_actions=3,
+            n_actions=6,
             n_substeps=20,
             width=1280,
             height=720,
@@ -60,7 +61,21 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
                 "lookat": np.array([0, 0, 1])
             },
             **kwargs
-        )        
+        )
+
+        self.observation_space = Dict(
+            dict(
+                desired_goal=Box(
+                    -1, 1, shape=(7,), dtype="float64"
+                ),
+                achieved_goal=Box(
+                    -1, 1, shape=(7,), dtype="float64"
+                ),
+                observation=Box(
+                    -1, 1, shape=(6,), dtype="float64"
+                ),
+            )
+        )
 
         EzPickle.__init__(self, reward_type="dense", **kwargs)
     
@@ -99,22 +114,22 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # update the joint positions
         current_joint_pos = np.array([])
-        for i in range(3,6):
+        for i in range(6):
             current_joint_pos = np.append(current_joint_pos, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])
 
         new_joint_pos = np.array(current_joint_pos) + action
 
         # apply action to simulation.
-        for i in range(3,6):
-           self._utils.set_joint_qpos(self.model, self.data, self.joint_names[i], new_joint_pos[i-3])
+        for i in range(6):
+           self._utils.set_joint_qpos(self.model, self.data, self.joint_names[i], new_joint_pos[i])
 
     def _get_obs(self):
-        dt = self.n_substeps * self.model.opt.timestep
+        # dt = self.n_substeps * self.model.opt.timestep
 
         # observation
         observation = np.array([])
-        for i in range(3,6):
-            observation = np.append(observation, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])
+        for i in range(6):
+            observation = np.append(observation, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])/(2*np.pi)
 
             #TODO consider adding joint velocities
             # observation = np.append(observation, self._utils.get_joint_qvel(self.model, self.data, self.joint_names[i])[0])
@@ -123,11 +138,23 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # achieved_goal
         achieved_goal = self.get_eef()
+        achieved_goal[0] = (achieved_goal[0] - 0.100) / 1.8
+        achieved_goal[1] = (achieved_goal[1] - 0.950) / 1.8
+        achieved_goal[2] = (achieved_goal[2] - 0.780) / 1.8
+
+        # desired_goal
+        if len(self.goal)>0:
+            goal = self.goal.copy()
+            goal[0] = (goal[0] - 0.100) / 1.8
+            goal[1] = (goal[1] - 0.950) / 1.8
+            goal[2] = (goal[2] - 0.780) / 1.8
+        else:
+            goal = np.zeros(7)
 
         return {
             "observation": observation,
             "achieved_goal": achieved_goal,
-            "desired_goal": self.goal
+            "desired_goal": goal
         }
 
     def _sample_goal(self):
