@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
+RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/position_only"
 
 plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["font.family"] = "sans-serif"
@@ -49,11 +49,13 @@ eval_df = df.iloc[:-1:2]
 train_df = df.iloc[1::2]
 
 # Call the function with the DataFrame
-# create_line_chart(train_df["time/episodes"], (eval_df["train/loss"],), "Episodes", "Loss", save_path=f"{RESULTS_FOLDER}/loss.svg")
+create_line_chart(train_df["time/episodes"], (eval_df["train/actor_loss"],), "Episodes", "Actor Loss", save_path=f"{RESULTS_FOLDER}/actor_loss.svg")
 
-create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean (Max 100)", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
+create_line_chart(train_df["time/episodes"], (eval_df["train/critic_loss"],), "Episodes", "Critic Loss", save_path=f"{RESULTS_FOLDER}/critic_loss.svg")
 
-# create_line_chart(train_df["time/episodes"], (train_df["rollout/exploration_rate"],), "Episodes", "Exploration Rate", save_path=f"{RESULTS_FOLDER}/exploration_rate.svg")
+create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean (Max 50)", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
+
+create_line_chart(train_df["time/episodes"], (eval_df["train/ent_coef"],), "Episodes", "Entropy Coefficient", save_path=f"{RESULTS_FOLDER}/entropy_coefficient.svg")
 
 create_line_chart(train_df["time/episodes"], (train_df["rollout/success_rate"], eval_df["eval/success_rate"]), "Episodes", "Success Rate", legend=["training success rate", "validation success rate"], save_path=f"{RESULTS_FOLDER}/success_rate.svg")
 

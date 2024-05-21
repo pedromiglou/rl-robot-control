@@ -49,7 +49,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             self,
             model_path=os.path.join(os.path.dirname(__file__), "models/env.xml"),
             initial_qpos={ k: v for k,v in zip(self.joint_names, self.initial_joint_values) },
-            n_actions=6,
+            n_actions=3,
             n_substeps=20,
             width=1280,
             height=720,
@@ -99,25 +99,27 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # update the joint positions
         current_joint_pos = np.array([])
-        for i in range(6):
+        for i in range(3,6):
             current_joint_pos = np.append(current_joint_pos, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])
 
         new_joint_pos = np.array(current_joint_pos) + action
 
         # apply action to simulation.
-        for i in range(6):
-           self._utils.set_joint_qpos(self.model, self.data, self.joint_names[i], new_joint_pos[i])
+        for i in range(3,6):
+           self._utils.set_joint_qpos(self.model, self.data, self.joint_names[i], new_joint_pos[i-3])
 
     def _get_obs(self):
         dt = self.n_substeps * self.model.opt.timestep
 
         # observation
         observation = np.array([])
-        for i in range(6):
+        for i in range(3,6):
             observation = np.append(observation, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])
-            observation = np.append(observation, self._utils.get_joint_qvel(self.model, self.data, self.joint_names[i])[0])
 
-        # robot_qvel *= dt # to match mujoco velocity #TODO
+            #TODO consider adding joint velocities
+            # observation = np.append(observation, self._utils.get_joint_qvel(self.model, self.data, self.joint_names[i])[0])
+
+        # robot_qvel *= dt # to match mujoco velocity
 
         # achieved_goal
         achieved_goal = self.get_eef()
