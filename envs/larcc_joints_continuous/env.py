@@ -80,16 +80,16 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         EzPickle.__init__(self, reward_type="dense", **kwargs)
     
     def get_eef(self):
-        body_id = self._mujoco.mj_name2id(
-            self.model, self._mujoco.mjtObj.mjOBJ_BODY, "eef"
-        )
-
+        body_id = self._mujoco.mj_name2id(self.model, self._mujoco.mjtObj.mjOBJ_BODY, "eef")
         return np.concatenate((self.data.xpos[body_id], self.data.xquat[body_id]))
 
     # GoalEnv methods
     # ----------------------------
 
     def compute_reward(self, achieved_goal, goal, info):
+        achieved_goal = self.get_eef()
+        goal = self.goal
+
         # compute the position error
         pos_error = point_distance(goal[:3], achieved_goal[:3])
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
@@ -175,7 +175,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         return np.concatenate((goal_pos, goal_quat))
 
     def _is_success(self, achieved_goal, desired_goal):
-        d = point_distance(achieved_goal[:3], desired_goal[:3])
+        d = point_distance(achieved_goal[:3], desired_goal[:3])*1.8
         return (d < self.distance_threshold).astype(np.float32)
 
     def _step_callback(self):

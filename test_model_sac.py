@@ -6,8 +6,8 @@ from stable_baselines3 import SAC
 import envs.larcc_joints_continuous.env
 
 
-# RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/position_only"
-RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
+RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
+#RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
 
 # load env
 env = gym.make("Larcc", max_episode_steps=50, render_mode="human")
@@ -19,7 +19,7 @@ observation, info = env.reset(seed=42)
 model = SAC.load(f'{RESULTS_FOLDER}/best_model')
 
 observation, info = env.reset()
-for _ in range(500):
+for _ in range(5000):
     action, _states = model.predict(observation, deterministic=True)
     observation, reward, terminated, truncated, info = env.step(action)
 
