@@ -5,6 +5,7 @@ import os
 import random
 
 from gymnasium.envs.registration import register
+from gymnasium.spaces import Box, Dict
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium_robotics.envs.robot_env import MujocoRobotEnv
 
@@ -14,7 +15,7 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.05, kp=1.0, ko=0.0, **kwargs):
+    def __init__(self, distance_threshold=0.05, kp=0.0, ko=1.0, **kwargs):
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
@@ -61,6 +62,20 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             },
             **kwargs
         )
+
+        # self.observation_space = Dict(
+        #     dict(
+        #         desired_goal=Box(
+        #             -1, 1, shape=(7,), dtype="float64"
+        #         ),
+        #         achieved_goal=Box(
+        #             -1, 1, shape=(7,), dtype="float64"
+        #         ),
+        #         observation=Box(
+        #             -1, 1, shape=(6,), dtype="float64"
+        #         ),
+        #     )
+        # )
 
         EzPickle.__init__(self, reward_type="dense", **kwargs)
     
@@ -118,10 +133,19 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # robot_qvel *= dt # to match mujoco velocity
 
+        # achieved_goal
+        achieved_goal = self.get_eef()
+
+        # desired_goal
+        if len(self.goal)>0:
+            goal = self.goal.copy()
+        else:
+            goal = np.zeros(7)
+
         return {
             "observation": observation,
-            "achieved_goal": self.get_eef(),
-            "desired_goal": self.goal
+            "achieved_goal": achieved_goal,
+            "desired_goal": goal
         }
 
     def _sample_goal(self):

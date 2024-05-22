@@ -49,7 +49,7 @@ class WrappedEnv(gym.Env):
         
         # action space: movements of the end effector in 26 directions + stay still
         # self.action_space = Discrete(len(self.discrete_actions))
-        self.action_space = Box(-1, 1, shape=(6,), dtype="float64")
+        self.action_space = Box(-1, 1, shape=(6,), dtype="float32")
 
         # observation space: end effector position, velocity, and target position
         self.observation_space = Dict(
