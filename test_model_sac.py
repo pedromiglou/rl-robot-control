@@ -6,8 +6,8 @@ from stable_baselines3 import SAC
 import envs.larcc_joints_continuous.env
 
 
-RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
-#RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
+# RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
+RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
 
 # load env
 env = gym.make("Larcc", max_episode_steps=50, render_mode="human")
