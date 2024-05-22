@@ -5,7 +5,6 @@ import os
 import random
 
 from gymnasium.envs.registration import register
-from gymnasium.spaces import Box, Dict
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium_robotics.envs.robot_env import MujocoRobotEnv
 
