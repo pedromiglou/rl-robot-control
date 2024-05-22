@@ -7,7 +7,7 @@ from stable_baselines3 import DQN
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnNoModelImprovement
 from stable_baselines3.common.logger import configure
 
-from larcc_env.discrete import FetchReachCartesianDiscrete
+from fetch_reach_cartesian.env import FetchReachCartesianDiscrete
 
 
 RESULTS_FOLDER = "./results/fetch_reach_cartesian_discrete"
