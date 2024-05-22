@@ -15,7 +15,7 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.05, kp=0.0, ko=1.0, **kwargs):
+    def __init__(self, distance_threshold=0.05, kp=1.0, ko=0.0, **kwargs):
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
