@@ -13,7 +13,7 @@ from stable_baselines3.common.logger import configure
 from larcc_env.wrapped_env import WrappedEnv
 
 
-RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
+RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
 
 # set up logging
 logger = logging.getLogger(__name__)
