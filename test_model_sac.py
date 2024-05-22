@@ -3,15 +3,15 @@
 import gymnasium as gym
 from stable_baselines3 import SAC
 
-import envs.larcc_joints_continuous.env
+from larcc_env.wrapped_env import WrappedEnv
 
 
 # RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
 RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
 
 # load env
-env = gym.make("Larcc", max_episode_steps=50, render_mode="human")
-# env = FetchReachJointsContinuous(max_episode_steps=50, render_mode="rgb_array", record=True)
+env = WrappedEnv(max_episode_steps=50, render_mode="human")
+# env = WrappedEnv(max_episode_steps=50, render_mode="rgb_array", record_path=f"{RESULTS_FOLDER}/demo")
 
 observation, info = env.reset(seed=42)
 

@@ -5,7 +5,6 @@ import os
 import random
 
 from gymnasium.envs.registration import register
-from gymnasium.spaces import Box, Dict
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium_robotics.envs.robot_env import MujocoRobotEnv
 
@@ -63,20 +62,6 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             **kwargs
         )
 
-        self.observation_space = Dict(
-            dict(
-                desired_goal=Box(
-                    -1, 1, shape=(7,), dtype="float64"
-                ),
-                achieved_goal=Box(
-                    -1, 1, shape=(7,), dtype="float64"
-                ),
-                observation=Box(
-                    -1, 1, shape=(6,), dtype="float64"
-                ),
-            )
-        )
-
         EzPickle.__init__(self, reward_type="dense", **kwargs)
     
     def get_eef(self):
@@ -87,9 +72,6 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     # ----------------------------
 
     def compute_reward(self, achieved_goal, goal, info):
-        achieved_goal = self.get_eef()
-        goal = self.goal
-
         # compute the position error
         pos_error = point_distance(goal[:3], achieved_goal[:3])
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
@@ -129,32 +111,17 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         # observation
         observation = np.array([])
         for i in range(6):
-            observation = np.append(observation, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])/(2*np.pi)
+            observation = np.append(observation, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])
 
             #TODO consider adding joint velocities
             # observation = np.append(observation, self._utils.get_joint_qvel(self.model, self.data, self.joint_names[i])[0])
 
         # robot_qvel *= dt # to match mujoco velocity
 
-        # achieved_goal
-        achieved_goal = self.get_eef()
-        achieved_goal[0] = (achieved_goal[0] - 0.100) / 1.8
-        achieved_goal[1] = (achieved_goal[1] - 0.950) / 1.8
-        achieved_goal[2] = (achieved_goal[2] - 0.780) / 1.8
-
-        # desired_goal
-        if len(self.goal)>0:
-            goal = self.goal.copy()
-            goal[0] = (goal[0] - 0.100) / 1.8
-            goal[1] = (goal[1] - 0.950) / 1.8
-            goal[2] = (goal[2] - 0.780) / 1.8
-        else:
-            goal = np.zeros(7)
-
         return {
             "observation": observation,
-            "achieved_goal": achieved_goal,
-            "desired_goal": goal
+            "achieved_goal": self.get_eef(),
+            "desired_goal": self.goal
         }
 
     def _sample_goal(self):
@@ -175,7 +142,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         return np.concatenate((goal_pos, goal_quat))
 
     def _is_success(self, achieved_goal, desired_goal):
-        d = point_distance(achieved_goal[:3], desired_goal[:3])*1.8
+        d = point_distance(achieved_goal[:3], desired_goal[:3])
         return (d < self.distance_threshold).astype(np.float32)
 
     def _step_callback(self):
