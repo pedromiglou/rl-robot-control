@@ -14,7 +14,7 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.05, kp=0.0, ko=1.0, **kwargs):
+    def __init__(self, distance_threshold=0.05, kp=1.0, ko=0.5, **kwargs):
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
@@ -62,20 +62,6 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             **kwargs
         )
 
-        # self.observation_space = Dict(
-        #     dict(
-        #         desired_goal=Box(
-        #             -1, 1, shape=(7,), dtype="float64"
-        #         ),
-        #         achieved_goal=Box(
-        #             -1, 1, shape=(7,), dtype="float64"
-        #         ),
-        #         observation=Box(
-        #             -1, 1, shape=(6,), dtype="float64"
-        #         ),
-        #     )
-        # )
-
         EzPickle.__init__(self, reward_type="dense", **kwargs)
     
     def get_eef(self):
@@ -106,7 +92,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         )  # ensure that we don't change the action outside of this scope
 
         # scale the action to a maximum movement of 0.1 radians in each joint
-        action *= 0.1
+        action[:2] *= 0.08
+        action[2:] *= 0.12
 
         # update the joint positions
         current_joint_pos = np.array([])
@@ -114,6 +101,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             current_joint_pos = np.append(current_joint_pos, self._utils.get_joint_qpos(self.model, self.data, self.joint_names[i])[0])
 
         new_joint_pos = np.array(current_joint_pos) + action
+
+        new_joint_pos = np.clip(new_joint_pos, -np.pi, np.pi)
 
         # apply action to simulation.
         for i in range(6):

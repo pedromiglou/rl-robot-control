@@ -67,7 +67,7 @@ class WrappedEnv(gym.Env):
         )
 
     def normalize_obs(self, obs):
-        obs["observation"] = obs["observation"]/(2*np.pi)
+        obs["observation"] = obs["observation"]/np.pi
 
         obs["achieved_goal"][0] = (obs["achieved_goal"][0] - 0.100) / 1.8
         obs["achieved_goal"][1] = (obs["achieved_goal"][1] - 0.950) / 1.8
