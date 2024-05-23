@@ -6,8 +6,8 @@ from stable_baselines3 import SAC
 from larcc_env.wrapped_env import WrappedEnv
 
 
-# RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
-RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
+RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
+# RESULTS_FOLDER = "./results/fetch_reach_joints_continuous"
 
 # load env
 env = WrappedEnv(max_episode_steps=50, render_mode="human")
