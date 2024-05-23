@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-# RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/position_only"
-RESULTS_FOLDER = "./results/fetch_reach_joints_continuous/orientation_only"
+RESULTS_FOLDER = "./results/larcc_joints_continuous"
+# RESULTS_FOLDER = "./results/larcc_joints_continuous/position_only"
+# RESULTS_FOLDER = "./results/larcc_joints_continuous/orientation_only"
 
 plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["font.family"] = "sans-serif"

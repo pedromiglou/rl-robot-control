@@ -90,9 +90,9 @@ class WrappedEnv(gym.Env):
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
 
-            if info["is_success"]: # if the episode is successful, capture more frames
-                for _ in range(10):
-                    self.video_recorder.capture_frame()
+            #if info["is_success"]: # if the episode is successful, capture more frames
+                #for _ in range(10):
+                #    self.video_recorder.capture_frame()
 
         return obs, reward, terminated, truncated, info
     
