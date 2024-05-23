@@ -176,8 +176,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
     def _reset_sim(self):
         self.data.time = self.initial_time
-        self.data.qpos[:] = np.copy(self.initial_qpos)
-        self.data.qvel[:] = np.copy(self.initial_qvel)
+        #self.data.qpos[:] = np.copy(self.initial_qpos)
+        #self.data.qvel[:] = np.copy(self.initial_qvel)
         if self.model.na != 0:
            self.data.act[:] = None
 
