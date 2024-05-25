@@ -77,8 +77,11 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
 
         # compute the orientation error
-        quat_error = 1 - max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
-        quat_reward = 1 - quat_error / 2 # [0, 1]
+        if pos_error < 0.05:
+            quat_error = 1 - max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
+            quat_reward = 1 - quat_error / 2 # [0, 1]
+        else:
+            quat_reward = 0
 
         # compute the reward
         return self.kp * pos_reward + self.ko * quat_reward
