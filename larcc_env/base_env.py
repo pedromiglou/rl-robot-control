@@ -14,7 +14,7 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.05, kp=1.0, ko=0.5, **kwargs):
+    def __init__(self, distance_threshold=0.05, kp=0.5, ko=0.25, **kwargs):
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
@@ -77,14 +77,14 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
 
         # compute the orientation error
-        if pos_error < 0.05:
-            quat_error = 1 - max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
-            quat_reward = 1 - quat_error / 2 # [0, 1]
-        else:
-            quat_reward = 0
+        # quat_error = 1 - max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
+        # quat_reward = 1 - quat_error / 2 # [0, 1]
+        quat_reward = max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
+
+        final_reward = self.kp * pos_reward + self.ko * quat_reward
 
         # compute the reward
-        return self.kp * pos_reward + self.ko * quat_reward
+        return final_reward + (1-self.kp-self.ko) if final_reward > self.kp + self.ko -0.1 else final_reward
 
     # RobotEnv methods
     # ----------------------------
@@ -179,8 +179,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
     def _reset_sim(self):
         self.data.time = self.initial_time
-        #self.data.qpos[:] = np.copy(self.initial_qpos)
-        #self.data.qvel[:] = np.copy(self.initial_qvel)
+        self.data.qpos[:] = np.copy(self.initial_qpos)
+        self.data.qvel[:] = np.copy(self.initial_qvel)
         if self.model.na != 0:
            self.data.act[:] = None
 
