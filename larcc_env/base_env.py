@@ -77,7 +77,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def compute_reward(self, achieved_goal, goal, info):
         # compute the position reward
         pos_error = point_distance(goal[:3], achieved_goal[:3])
-        pos_reward = np.clip((self.initial_distance - pos_error) / self.initial_distance, -1, 1) # [-1, 1]
+        #pos_reward = np.clip((self.initial_distance - pos_error) / self.initial_distance, -1, 1) # [-1, 1]
+        pos_reward = np.clip(1 - pos_error, -1, 1) # [-1, 1]
         self.pos_rewards.append(pos_reward)
 
         # compute the orientation reward
@@ -86,7 +87,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
         # compute the bonus reward
         bonus_reward = (1-self.kp-self.ko) if self.kp * pos_reward + self.ko * quat_reward > self.kp + self.ko -0.1 else 0
-        self.bonus_rewards.append(1)
+        self.bonus_rewards.append(1 if bonus_reward > 0 else 0)
 
         # compute the final reward
         return self.kp * pos_reward + self.ko * quat_reward + bonus_reward
@@ -162,8 +163,9 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         return np.concatenate((goal_pos, goal_quat))
 
     def _is_success(self, achieved_goal, desired_goal):
-        d = point_distance(achieved_goal[:3], desired_goal[:3])
-        return (d < self.distance_threshold).astype(np.float32)
+        #d = point_distance(achieved_goal[:3], desired_goal[:3])
+        #return (d < self.distance_threshold).astype(np.float32)
+        return self.bonus_rewards[-1] == 1
 
     def _step_callback(self):
         # function to apply additional constraints on the simulation
