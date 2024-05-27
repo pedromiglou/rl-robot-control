@@ -165,7 +165,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def _is_success(self, achieved_goal, desired_goal):
         #d = point_distance(achieved_goal[:3], desired_goal[:3])
         #return (d < self.distance_threshold).astype(np.float32)
-        return self.bonus_rewards[-1] == 1
+        return len(self.bonus_rewards)>0 and self.bonus_rewards[-1] == 1
 
     def _step_callback(self):
         # function to apply additional constraints on the simulation
