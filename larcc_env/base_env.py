@@ -22,6 +22,9 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         self.initial_distance = None
         self.kp = kp
         self.ko = ko
+        self.pos_rewards = []
+        self.quat_rewards = []
+        self.bonus_rewards = []
 
         # store relevant vlues for goal generation
         self.table_pos = np.array([0.1, 0.16, 0.38])
@@ -72,19 +75,21 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     # ----------------------------
 
     def compute_reward(self, achieved_goal, goal, info):
-        # compute the position error
+        # compute the position reward
         pos_error = point_distance(goal[:3], achieved_goal[:3])
-        pos_reward = (self.initial_distance - pos_error) / self.initial_distance # [-inf, 1]
+        pos_reward = np.clip((self.initial_distance - pos_error) / self.initial_distance, -1, 1) # [-1, 1]
+        self.pos_rewards.append(pos_reward)
 
-        # compute the orientation error
-        # quat_error = 1 - max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
-        # quat_reward = 1 - quat_error / 2 # [0, 1]
-        quat_reward = max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:]))
+        # compute the orientation reward
+        quat_reward = max(np.dot(goal[3:], achieved_goal[3:]), np.dot(goal[3:], -achieved_goal[3:])) # [-1, 1]
+        self.quat_rewards.append(quat_reward)
 
-        final_reward = self.kp * pos_reward + self.ko * quat_reward
+        # compute the bonus reward
+        bonus_reward = (1-self.kp-self.ko) if self.kp * pos_reward + self.ko * quat_reward > self.kp + self.ko -0.1 else 0
+        self.bonus_rewards.append(1)
 
-        # compute the reward
-        return final_reward + (1-self.kp-self.ko) if final_reward > self.kp + self.ko -0.1 else final_reward
+        # compute the final reward
+        return self.kp * pos_reward + self.ko * quat_reward + bonus_reward
 
     # RobotEnv methods
     # ----------------------------

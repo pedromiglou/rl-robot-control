@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+#import os
+#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import logging
 import time
 
 from stable_baselines3 import SAC
-from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnNoModelImprovement
 from stable_baselines3.common.logger import configure
 
+from custom_callback import CustomCallback
 from larcc_env.wrapped_env import WrappedEnv
 
 
@@ -22,17 +22,13 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, filename=f'{RESULTS_FOLDER}/logs.log', filemode='w')
 env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 
-# create env
 logger.info("Creating environment...")
 env = WrappedEnv(max_episode_steps=50)#, render_mode="human")
 eval_env = WrappedEnv(max_episode_steps=50)
 
-# Stop training if there is no improvement after more than 3 evaluations
 logger.info("Setting up callbacks...")
-stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=10, min_evals=5, verbose=1)
-eval_callback = EvalCallback(eval_env, eval_freq=500*50, n_eval_episodes=100, callback_after_eval=stop_train_callback, verbose=1, best_model_save_path=RESULTS_FOLDER, deterministic=True)
+callback = CustomCallback(eval_env, best_model_save_path=RESULTS_FOLDER)
 
-# train model
 logger.info("Starting model training...")
 t1 = time.time()
 
@@ -42,7 +38,7 @@ model = SAC("MultiInputPolicy", env, verbose=1)
 # model = SAC.load(f'{RESULTS_FOLDER}/model')
 # model.set_env(env)
 model.set_logger(env_logger)
-model.learn(total_timesteps=5e6, log_interval=500, callback=eval_callback)
+model.learn(total_timesteps=5e6, log_interval=500, callback=callback)
 model.save(f'{RESULTS_FOLDER}/final_model')
 
 env.close()
