@@ -50,9 +50,6 @@ class CustomCallback(EvalCallback):
             episode_rewards_pos = self.eval_env.envs[0].env.pos_rewards
             episode_rewards_quat = self.eval_env.envs[0].env.quat_rewards
             episode_rewards_bonus = self.eval_env.envs[0].env.bonus_rewards
-            self.eval_env.envs[0].env.pos_rewards = []
-            self.eval_env.envs[0].env.quat_rewards = []
-            self.eval_env.envs[0].env.bonus_rewards = []
 
             if self.log_path is not None:
                 assert isinstance(episode_rewards, list)
@@ -84,6 +81,10 @@ class CustomCallback(EvalCallback):
             mean_bonus_reward = np.mean(episode_rewards_bonus)*50
             mean_ep_length, std_ep_length = np.mean(episode_lengths), np.std(episode_lengths)
             self.last_mean_reward = float(mean_reward)
+
+            self.eval_env.envs[0].env.pos_rewards.clear()
+            self.eval_env.envs[0].env.quat_rewards.clear()
+            self.eval_env.envs[0].env.bonus_rewards.clear()
 
             if self.verbose >= 1:
                 print(f"Eval num_timesteps={self.num_timesteps}, " f"episode_reward={mean_reward:.2f} +/- {std_reward:.2f}")
