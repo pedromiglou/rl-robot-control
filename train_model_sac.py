@@ -13,7 +13,7 @@ from custom_callback import CustomCallback
 from larcc_env.wrapped_env import WrappedEnv
 
 
-RESULTS_FOLDER = "./results/larcc_joints_continuous"
+RESULTS_FOLDER = "./results/larcc_joints_continuous2"
 # RESULTS_FOLDER = "./results/larcc_joints_continuous/position_only"
 # RESULTS_FOLDER = "./results/larcc_joints_continuous/orientation_only"
 
