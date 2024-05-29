@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-RESULTS_FOLDER = "./results/fetch_reach_cartesian_discrete"
+RESULTS_FOLDER = "./results"
 
 plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams["font.family"] = "sans-serif"

@@ -86,7 +86,7 @@ class FetchReachCartesianDiscrete(gym.Env):
             "robot0:wrist_roll_joint"
         ]
 
-        self.joint_values_file = open("./results/fetch_reach_cartesian_discrete/joint_values.txt", "w")
+        # self.joint_values_file = open("./results/fetch_reach_cartesian_discrete/joint_values.txt", "w")
 
         self.record = record
         if self.record:
@@ -134,8 +134,8 @@ class FetchReachCartesianDiscrete(gym.Env):
 
         reward = self.compute_reward(obs)
 
-        joint_values = list(mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[1])
-        self.joint_values_file.write(f"{','.join([str(v) for v in joint_values])}\n")
+        # joint_values = list(mujoco_utils.robot_get_obs(self.env.model, self.env.data, self.joint_names)[1])
+        # self.joint_values_file.write(f"{','.join([str(v) for v in joint_values])}\n")
         
         if self.record: # before returning, capture a frame if recording
             self.video_recorder.capture_frame()
@@ -162,7 +162,7 @@ class FetchReachCartesianDiscrete(gym.Env):
         return self.env.render()
     
     def close(self):
-        self.joint_values_file.close()
+        # self.joint_values_file.close()
         if self.record:
             self.video_recorder.close()
 

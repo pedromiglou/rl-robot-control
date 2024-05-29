@@ -2,10 +2,10 @@
 
 from stable_baselines3 import DQN
 
-from fetch_reach_cartesian.env import FetchReachCartesianDiscrete
+from env import FetchReachCartesianDiscrete
 
 
-RESULTS_FOLDER = "./results/fetch_reach_cartesian_discrete"
+RESULTS_FOLDER = "./results"
 
 # load env
 env = FetchReachCartesianDiscrete(max_episode_steps=50, render_mode="human")
