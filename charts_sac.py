@@ -57,6 +57,8 @@ create_line_chart(train_df["time/episodes"], (eval_df["train/critic_loss"],), "E
 
 create_line_chart(train_df["time/episodes"], (train_df["rollout/ep_rew_mean"], eval_df["eval/mean_reward"]), "Episodes", "Episode Reward Mean (Max 50)", legend=["training mean reward", "validation mean reward"], save_path=f"{RESULTS_FOLDER}/reward.svg")
 
+create_line_chart(train_df["time/episodes"], (eval_df["eval/mean_pos_reward"], eval_df["eval/mean_quat_reward"], eval_df["eval/mean_bonus_reward"]), "Episodes", "Reward Components Mean (Max 50)", legend=["position reward", "orientation reward", "bonus reward"], save_path=f"{RESULTS_FOLDER}/reward_components.svg")
+
 create_line_chart(train_df["time/episodes"], (eval_df["train/ent_coef"],), "Episodes", "Entropy Coefficient", save_path=f"{RESULTS_FOLDER}/entropy_coefficient.svg")
 
 create_line_chart(train_df["time/episodes"], (train_df["rollout/success_rate"], eval_df["eval/success_rate"]), "Episodes", "Success Rate", legend=["training success rate", "validation success rate"], save_path=f"{RESULTS_FOLDER}/success_rate.svg")

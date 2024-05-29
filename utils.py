@@ -51,3 +51,14 @@ def random_euler_angles():
     yaw = np.random.uniform(0, 2*np.pi)
 
     return roll, pitch, yaw
+
+
+def quaternion_to_transformation_matrix(q):
+    w, x, y, z = q
+    R = np.array([
+        [1 - 2*y**2 - 2*z**2, 2*x*y - 2*z*w, 2*x*z + 2*y*w,0],
+        [2*x*y + 2*z*w, 1 - 2*x**2 - 2*z**2, 2*y*z - 2*x*w,0],
+        [2*x*z - 2*y*w, 2*y*z + 2*x*w, 1 - 2*x**2 - 2*y**2,0],
+        [0,0,0,1]
+    ])
+    return R

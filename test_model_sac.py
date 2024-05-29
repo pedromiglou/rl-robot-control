@@ -12,7 +12,7 @@ RESULTS_FOLDER = "./results/larcc_joints_continuous"
 
 # load env
 env = WrappedEnv(max_episode_steps=50, render_mode="human")
-#env = WrappedEnv(max_episode_steps=50, render_mode="rgb_array", record_path=f"{RESULTS_FOLDER}/demo")
+# env = WrappedEnv(max_episode_steps=50, render_mode="rgb_array", record_path=f"{RESULTS_FOLDER}/demo")
 
 observation, info = env.reset(seed=42)
 

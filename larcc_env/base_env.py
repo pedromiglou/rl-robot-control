@@ -8,7 +8,7 @@ from gymnasium.envs.registration import register
 from gymnasium.utils.ezpickle import EzPickle
 from gymnasium_robotics.envs.robot_env import MujocoRobotEnv
 
-from utils import euler_to_quaternion, point_distance, random_euler_angles
+from utils import euler_to_quaternion, point_distance, random_euler_angles, quaternion_to_transformation_matrix
 
 
 class LarccEnv(MujocoRobotEnv, EzPickle):
@@ -86,7 +86,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         self.quat_rewards.append(quat_reward)
 
         # compute the bonus reward
-        bonus_reward = 1 if pos_reward > 0.995 and quat_reward > 0.995 else 0
+        bonus_reward = 1 if pos_reward > 0.99 and quat_reward > 0.99 else 0
         self.bonus_rewards.append(bonus_reward)
 
         # compute the final reward
@@ -147,16 +147,21 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
 
     def _sample_goal(self):
         goal_pos = np.array([
-            self.table_pos[0] + random.uniform(-self.table_size[0]/2, self.table_size[0]/2),
-            self.table_pos[1] + random.uniform(-self.table_size[1]/2+0.15, self.table_size[1]/2),
-            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.4)
+            self.table_pos[0] + random.uniform(-self.table_size[0]/2+0.1, self.table_size[0]/2-0.1),
+            self.table_pos[1] + random.uniform(-self.table_size[1]/2, self.table_size[1]/2),
+            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.7)
         ])
         self.initial_distance = point_distance(self.get_eef()[:3], goal_pos)
 
         while True:
             w, x, y, z = euler_to_quaternion(*random_euler_angles())
 
-            if 1 - 2 * (x**2 + y**2) < -0.5: # sin(30 degrees)
+            tf = quaternion_to_transformation_matrix([w, x, y, z])
+
+            z_axis = np.dot(tf,np.array([0, 0, 1, 0]))
+
+            # guarantee that the orientation is pointing forward and slightly downwards
+            if z_axis[2] < np.sin(np.pi/6) and z_axis[1] < -np.sin(np.pi/4):
                 goal_quat = [w, x, y, z]
                 break
 
@@ -187,6 +192,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def _reset_sim(self):
         self.data.time = self.initial_time
         self.data.qpos[:] = np.copy(self.initial_qpos)
+        self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
         self.data.qvel[:] = np.copy(self.initial_qvel)
         if self.model.na != 0:
            self.data.act[:] = None
