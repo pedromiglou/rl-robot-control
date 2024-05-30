@@ -14,7 +14,7 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles, quat
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.05, kp=0.5, ko=0.25, **kwargs):
+    def __init__(self, distance_threshold=0.02, kp=0.5, ko=0.25, **kwargs):
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
@@ -86,7 +86,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         self.quat_rewards.append(quat_reward)
 
         # compute the bonus reward
-        bonus_reward = 1 if pos_reward > 0.99 and quat_reward > 0.99 else 0
+        bonus_reward = 1 if pos_reward > 1 - self.distance_threshold and quat_reward > 0.99 else 0
         self.bonus_rewards.append(bonus_reward)
 
         # compute the final reward
@@ -192,7 +192,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def _reset_sim(self):
         self.data.time = self.initial_time
         self.data.qpos[:] = np.copy(self.initial_qpos)
-        self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
+        #self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
         self.data.qvel[:] = np.copy(self.initial_qvel)
         if self.model.na != 0:
            self.data.act[:] = None
