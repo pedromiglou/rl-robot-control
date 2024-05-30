@@ -1,5 +1,5 @@
-# Ubuntu 20 distrobox image
-FROM quay.io/toolbx-images/ubuntu-toolbox:20.04
+# Use distrobox image with ROS Noetic and CUDA 11.8 as base
+FROM pedromiglou/ros-cuda-distrobox:noetic-11.8
 
 # Install apt dependencies
 RUN apt-get update && apt-get upgrade -y
@@ -15,4 +15,4 @@ RUN pip install torch --index-url \
         https://download.pytorch.org/whl/cu118
 RUN pip install gymnasium gymnasium-robotics \
         stable-baselines3 pygame moviepy \
-        matplotlib pandas numpy
+        matplotlib pandas numpy==1.24.4
