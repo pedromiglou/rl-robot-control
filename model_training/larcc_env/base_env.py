@@ -71,6 +71,16 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         body_id = self._mujoco.mj_name2id(self.model, self._mujoco.mjtObj.mjOBJ_BODY, "eef")
         return np.concatenate((self.data.xpos[body_id], self.data.xquat[body_id]))
 
+    def set_goal(self, goal):
+        self.goal = goal
+
+        body_id = self._mujoco.mj_name2id(
+            self.model, self._mujoco.mjtObj.mjOBJ_BODY, "target0"
+        )
+        self.model.body_pos[body_id] = self.goal[:3]
+        self.model.body_quat[body_id] = self.goal[3:]
+        self._mujoco.mj_forward(self.model, self.data)
+
     # GoalEnv methods
     # ----------------------------
 
@@ -148,8 +158,8 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def _sample_goal(self):
         goal_pos = np.array([
             self.table_pos[0] + random.uniform(-self.table_size[0]/2+0.1, self.table_size[0]/2-0.1),
-            self.table_pos[1] + random.uniform(-self.table_size[1]/2, self.table_size[1]/2),
-            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.7)
+            self.table_pos[1] + random.uniform(-self.table_size[1]/2, self.table_size[1]/2-0.1),
+            self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.6)
         ])
         self.initial_distance = point_distance(self.get_eef()[:3], goal_pos)
 
@@ -161,7 +171,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             z_axis = np.dot(tf,np.array([0, 0, 1, 0]))
 
             # guarantee that the orientation is pointing forward and slightly downwards
-            if z_axis[2] < np.sin(np.pi/6) and z_axis[1] < -np.sin(np.pi/4):
+            if z_axis[2] < np.sin(-np.pi/6) and z_axis[1] < -np.sin(np.pi/4):
                 goal_quat = [w, x, y, z]
                 break
 

@@ -96,8 +96,12 @@ class WrappedEnv(gym.Env):
 
         return obs, reward, terminated, truncated, info
     
-    def reset(self, **kwargs):
+    def reset(self, goal=None, **kwargs):
         obs, info = self.env.reset(**kwargs)
+
+        if goal is not None:
+            self.env.set_goal(goal.copy())
+            obs["desired_goal"] = goal
 
         obs = self.normalize_obs(obs)
 
