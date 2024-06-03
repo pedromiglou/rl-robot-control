@@ -80,6 +80,28 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         self.model.body_pos[body_id] = self.goal[:3]
         self.model.body_quat[body_id] = self.goal[3:]
         self._mujoco.mj_forward(self.model, self.data)
+    
+    def validate_initial_qpos(self, qpos):
+        if len(qpos) != 7:
+            return False
+        if qpos[0] < self.table_pos[0] - self.table_size[0]/2+0.1 or qpos[0] > self.table_pos[0] + self.table_size[0]/2-0.1:
+            return False
+        if qpos[1] < self.table_pos[1] - self.table_size[1]/2 or qpos[1] > self.table_pos[1] + self.table_size[1]/2-0.1:
+            return False
+        if qpos[2] < self.table_pos[2] + self.table_size[2]/2 + 0.1 or qpos[2] > self.table_pos[2] + self.table_size[2]/2 + 0.6:
+            return False
+        
+        w, x, y, z = qpos[3:]
+
+        tf = quaternion_to_transformation_matrix([w, x, y, z])
+
+        z_axis = np.dot(tf,np.array([0, 0, 1, 0]))
+
+        # guarantee that the orientation is pointing forward and slightly downwards
+        if z_axis[2] >= np.sin(-np.pi/6) or z_axis[1] >= -np.sin(np.pi/4):
+            return True
+        else:
+            return False
 
     # GoalEnv methods
     # ----------------------------
@@ -202,12 +224,24 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def _reset_sim(self):
         self.data.time = self.initial_time
         self.data.qpos[:] = np.copy(self.initial_qpos)
-        #self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
         self.data.qvel[:] = np.copy(self.initial_qvel)
         if self.model.na != 0:
            self.data.act[:] = None
 
-        self._mujoco.mj_forward(self.model, self.data)
+        # generate random qpos until a valid one is found
+        while True:
+            self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
+            self._mujoco.mj_forward(self.model, self.data)
+            if self.validate_initial_qpos(self.get_eef()):
+                robot_in_table = False
+                for joint_name in ["shoulder_link", "upper_arm_link", "forearm_link", "wrist_1_link", "wrist_2_link", "wrist_3_link"]:
+                    joint_id = self._mujoco.mj_name2id(self.model, self._mujoco.mjtObj.mjOBJ_BODY, joint_name)
+                    if self.data.xpos[joint_id][2] < self.table_size[2]:
+                        robot_in_table = True
+                
+                if not robot_in_table:
+                    break
+
         return True
 
     def _env_setup(self, initial_qpos):

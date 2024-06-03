@@ -13,7 +13,7 @@ from custom_callback import CustomCallback
 from larcc_env.wrapped_env import WrappedEnv
 
 
-RESULTS_FOLDER = "./results/larcc_joints_continuous2"
+RESULTS_FOLDER = "./results/larcc_joints_continuous"
 # RESULTS_FOLDER = "./results/larcc_joints_continuous/position_only"
 # RESULTS_FOLDER = "./results/larcc_joints_continuous/orientation_only"
 
@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, filename=f'{RESULTS_FOLDER}/logs.log', f
 env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 
 logger.info("Creating environment...")
-env = WrappedEnv(max_episode_steps=50)#, render_mode="human")
+env = WrappedEnv(max_episode_steps=50, render_mode="human")
 eval_env = WrappedEnv(max_episode_steps=50)
 
 logger.info("Setting up callbacks...")
