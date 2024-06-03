@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-RESULTS_FOLDER = "./results/larcc_joints_continuous"
+RESULTS_FOLDER = "./results/larcc_joints_continuous2"
 # RESULTS_FOLDER = "./results/larcc_joints_continuous/position_only"
 # RESULTS_FOLDER = "./results/larcc_joints_continuous/orientation_only"
 
@@ -21,7 +21,7 @@ def create_line_chart(x, y, xlabel, ylabel, legend=None, save_path=None):
     
     for line in y:
         # Plot the line chart
-        plt.plot(x, line)
+        plt.plot(x.to_numpy(), line.to_numpy())
     
     # Set the x-axis label
     plt.xlabel(xlabel)
@@ -47,8 +47,8 @@ file_path = f"{RESULTS_FOLDER}/progress.csv"
 # Read the CSV file
 df = pd.read_csv(file_path)
 
-eval_df = df.iloc[:-1:2]
-train_df = df.iloc[1::2]
+eval_df = df.iloc[:-1:2].reset_index(drop=True)
+train_df = df.iloc[1::2].reset_index(drop=True)
 
 # Call the function with the DataFrame
 create_line_chart(train_df["time/episodes"], (eval_df["train/actor_loss"],), "Episodes", "Actor Loss", save_path=f"{RESULTS_FOLDER}/actor_loss.svg")
