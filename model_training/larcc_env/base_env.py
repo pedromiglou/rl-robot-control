@@ -96,7 +96,7 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
         self.quat_rewards.append(quat_reward)
 
         # compute the bonus reward
-        bonus_reward = 1 if pos_reward > 1 - self.distance_threshold and quat_reward > 0.99 else 0
+        bonus_reward = 1 if pos_reward > 1 - self.distance_threshold and quat_reward > 0.98 else 0
         self.bonus_rewards.append(bonus_reward)
 
         # compute the final reward
