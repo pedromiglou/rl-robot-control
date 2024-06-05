@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, filename=f'{RESULTS_FOLDER}/logs.log', f
 env_logger = configure(RESULTS_FOLDER, ["stdout", "csv"])
 
 logger.info("Creating environment...")
-env = WrappedEnv(max_episode_steps=50, render_mode="human")
+env = WrappedEnv(max_episode_steps=50)#, render_mode="human")
 eval_env = WrappedEnv(max_episode_steps=50)
 
 logger.info("Setting up callbacks...")
@@ -38,7 +38,7 @@ model = SAC("MultiInputPolicy", env, verbose=1)
 # model = SAC.load(f'{RESULTS_FOLDER}/model')
 # model.set_env(env)
 model.set_logger(env_logger)
-model.learn(total_timesteps=5e6, log_interval=500, callback=callback)
+model.learn(total_timesteps=5e7, log_interval=500, callback=callback)
 model.save(f'{RESULTS_FOLDER}/final_model')
 
 env.close()
