@@ -38,7 +38,7 @@ model = SAC("MultiInputPolicy", env, verbose=1)
 # model = SAC.load(f'{RESULTS_FOLDER}/model')
 # model.set_env(env)
 model.set_logger(env_logger)
-model.learn(total_timesteps=5e7, log_interval=500, callback=callback)
+model.learn(total_timesteps=1e7, log_interval=500, callback=callback)
 model.save(f'{RESULTS_FOLDER}/final_model')
 
 env.close()

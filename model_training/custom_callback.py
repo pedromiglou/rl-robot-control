@@ -12,8 +12,8 @@ from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnNoMod
 class CustomCallback(EvalCallback):
     def __init__(self, eval_env, best_model_save_path):
         # Stop training if there is no improvement after more than 10 evaluations
-        # stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=20, min_evals=150, verbose=1)
-        super().__init__(eval_env, eval_freq=500*50, n_eval_episodes=100, callback_after_eval=None, verbose=1, best_model_save_path=best_model_save_path, deterministic=True)
+        stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=20, min_evals=150, verbose=1)
+        super().__init__(eval_env, eval_freq=500*50, n_eval_episodes=100, callback_after_eval=stop_train_callback, verbose=1, best_model_save_path=best_model_save_path, deterministic=True)
         self.evaluations_results_pos = []
         self.evaluations_results_quat = []
         self.evaluations_results_bonus = []
