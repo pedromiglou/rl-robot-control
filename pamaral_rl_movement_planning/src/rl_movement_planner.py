@@ -17,7 +17,7 @@ from larcc_env.wrapped_env import WrappedEnv
 class RLMovementPlanner:
     def __init__(self):
         self.env = WrappedEnv(max_episode_steps=50, render_mode="human")
-        self.model = SAC.load(f'{os.environ["HOME"]}/catkin_ws/src/rl-robot-control/model_training/results/larcc_joints_continuous/1/best_model')
+        self.model = SAC.load(f'{os.environ["HOME"]}/catkin_ws/src/rl-robot-control/model_training/results/larcc_joints_continuous/best_model')
 
         self.planned_movement_publisher = rospy.Publisher("/planned_movement", Float64MultiArray, queue_size=1)
         self.goal_pose_subscriber = rospy.Subscriber("/goal_pose", Pose, self.goal_pose_callback)
