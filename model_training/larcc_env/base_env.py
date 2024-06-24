@@ -14,12 +14,14 @@ from utils import euler_to_quaternion, point_distance, random_euler_angles, quat
 class LarccEnv(MujocoRobotEnv, EzPickle):
     """Class for Larcc environment inspired by the Fetch environments."""
 
-    def __init__(self, distance_threshold=0.02, kp=0.5, ko=0.25, **kwargs):
+    def __init__(self, random_start=False, distance_threshold=0.02, kp=0.5, ko=0.25, **kwargs):
+        # random or fixed starting joint positions
+        self.random_start = random_start
+
         # distance threshold for successful episode
         self.distance_threshold = distance_threshold
 
         # store initial distance and weights for reward computation
-        self.initial_distance = None
         self.kp = kp
         self.ko = ko
         self.pos_rewards = []
@@ -109,7 +111,6 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
     def compute_reward(self, achieved_goal, goal, info):
         # compute the position reward
         pos_error = point_distance(goal[:3], achieved_goal[:3])
-        #pos_reward = np.clip((self.initial_distance - pos_error) / self.initial_distance, -1, 1) # [-1, 1]
         pos_reward = np.clip(1 - pos_error, -1, 1) # [-1, 1]
         self.pos_rewards.append(pos_reward)
 
@@ -183,7 +184,6 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
             self.table_pos[1] + random.uniform(-self.table_size[1]/2, self.table_size[1]/2-0.1),
             self.table_pos[2] + self.table_size[2]/2 + random.uniform(0.1, 0.6)
         ])
-        self.initial_distance = point_distance(self.get_eef()[:3], goal_pos)
 
         while True:
             w, x, y, z = euler_to_quaternion(*random_euler_angles())
@@ -229,18 +229,19 @@ class LarccEnv(MujocoRobotEnv, EzPickle):
            self.data.act[:] = None
 
         # generate random qpos until a valid one is found
-        while True:
-            self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
-            self._mujoco.mj_forward(self.model, self.data)
-            if self.validate_initial_qpos(self.get_eef()):
-                robot_in_table = False
-                for joint_name in ["shoulder_link", "upper_arm_link", "forearm_link", "wrist_1_link", "wrist_2_link", "wrist_3_link"]:
-                    joint_id = self._mujoco.mj_name2id(self.model, self._mujoco.mjtObj.mjOBJ_BODY, joint_name)
-                    if self.data.xpos[joint_id][2] < self.table_size[2]:
-                        robot_in_table = True
-                
-                if not robot_in_table:
-                    break
+        if self.random_start:
+            while True:
+                self.data.qpos[:6] = np.random.uniform(-np.pi, np.pi, 6)
+                self._mujoco.mj_forward(self.model, self.data)
+                if self.validate_initial_qpos(self.get_eef()):
+                    robot_in_table = False
+                    for joint_name in ["shoulder_link", "upper_arm_link", "forearm_link", "wrist_1_link", "wrist_2_link", "wrist_3_link"]:
+                        joint_id = self._mujoco.mj_name2id(self.model, self._mujoco.mjtObj.mjOBJ_BODY, joint_name)
+                        if self.data.xpos[joint_id][2] < self.table_size[2]:
+                            robot_in_table = True
+                    
+                    if not robot_in_table:
+                        break
 
         return True
 
